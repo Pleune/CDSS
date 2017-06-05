@@ -16,6 +16,8 @@ void tpool_add(tpool_t *, tpool_work_t, void *arg, int front);
 void tpool_pause(tpool_t *);
 void tpool_resume(tpool_t *);
 
+void tpool_flush(tpool_t *);
+
 #ifdef __cplusplus
 }
 #endif

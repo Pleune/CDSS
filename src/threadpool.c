@@ -27,8 +27,12 @@ struct threadpool {
     pthread_t threads[256];
     struct work_queue *queue;
     pthread_mutex_t mut;
+
     pthread_cond_t cond;
     pthread_mutex_t cond_mut;
+
+    pthread_cond_t flush;
+    pthread_mutex_t flush_mut;
 };
 
 static struct queue_pool pool = {{{0, 0, 0, 0}}, 0};
@@ -63,6 +67,10 @@ worker(void *arg)
 
         if(func != 0)
             func(arg);
+
+        pthread_mutex_lock(&data->flush_mut);
+        pthread_cond_broadcast(&data->flush);
+        pthread_mutex_unlock(&data->flush_mut);
     }
 
     return 0;
@@ -80,8 +88,12 @@ tpool_create(unsigned int threads)
     ret->num_threads = threads;
 
     pthread_mutex_init(&ret->mut, 0);
+
     pthread_cond_init(&ret->cond, 0);
     pthread_mutex_init(&ret->cond_mut, 0);
+
+    pthread_cond_init(&ret->flush, 0);
+    pthread_mutex_init(&ret->flush_mut, 0);
 
     size_t i;
     for(i=0; i<threads; i++)
@@ -103,8 +115,12 @@ tpool_destroy(tpool_t *t)
         pthread_join(t->threads[i], 0);
 
     pthread_mutex_destroy(&t->mut);
+
     pthread_cond_destroy(&t->cond);
     pthread_mutex_destroy(&t->cond_mut);
+
+    pthread_cond_destroy(&t->flush);
+    pthread_mutex_destroy(&t->flush_mut);
 
     free(t);
 }
@@ -176,4 +192,15 @@ tpool_resume(tpool_t *t)
     pthread_mutex_lock(&t->cond_mut);
     pthread_cond_broadcast(&t->cond);
     pthread_mutex_unlock(&t->cond_mut);
+}
+
+void
+tpool_flush(tpool_t *t)
+{
+    while(t->queue != 0)//single read needs no mutex lock.
+    {
+        pthread_mutex_lock(&t->flush_mut);
+        pthread_cond_wait(&t->flush, &t->flush_mut);
+        pthread_mutex_unlock(&t->flush_mut);
+    }
 }
