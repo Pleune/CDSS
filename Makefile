@@ -2,12 +2,15 @@ ROOT=./
 
 CFLAGS := -g -O3 -Wall
 LFLAGS := -g -pthread
+
 SNAME = libpleune.a
 DNAME = libpleune.so
 
 SRCDIR=$(ROOT)src/
+TESTDIR=$(ROOT)test/
 BUILDS=$(ROOT)build/static/
 BUILDD=$(ROOT)build/dynamic/
+BUILDTEST=$(ROOT)build/test/
 OUTPUTDIR=$(ROOT)bin/
 
 SRC:=$(wildcard $(SRCDIR)*.c)
@@ -15,34 +18,50 @@ SRC:=$(wildcard $(SRCDIR)*.c)
 OBJSS=$(patsubst $(SRCDIR)%.c,$(BUILDS)%.o,$(SRC))
 OBJSD=$(patsubst $(SRCDIR)%.c,$(BUILDD)%.o,$(SRC))
 
-.PHONY: clean install uninstall
+SRC_TEST:=$(wildcard $(TESTDIR)*.c)
+OBJSTEST=$(patsubst $(TESTDIR)%.c,$(BUILDTEST)%.o,$(SRC_TEST))
 
-all:	$(SNAME) $(DNAME)
+.PHONY: clean install uninstall test
+
+all:	$(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME) $(OUTPUTDIR)libpleune_tester
 
 -include $(OBJSS:.o=.d)
 -include $(OBJSD:.o=.d)
+-include $(OBJSTEST:.o=.d)
 
-$(SNAME): $(OBJSS)
-	$(AR) $(ARFLAGS) $(OUTPUTDIR)$@ $^
+$(OUTPUTDIR)$(SNAME): $(OBJSS)
+	$(AR) $(ARFLAGS) $@ $^
 
-$(DNAME): CFLAGS += -fPIC
-$(DNAME): LFLAGS += -shared
-$(DNAME): $(OBJSD)
-	$(CC) $(LFLAGS) $^ -o $(OUTPUTDIR)$@
+$(OUTPUTDIR)$(DNAME): CFLAGS += -fPIC
+$(OUTPUTDIR)$(DNAME): LFLAGS += -shared
+$(OUTPUTDIR)$(DNAME): $(OBJSD)
+	$(CC) $(LFLAGS) $^ -o $@
 
-$(BUILDS)%.d:	$(SRCDIR)%.c
+$(BUILDS)%.d: $(SRCDIR)%.c
 	$(CC) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
 
-$(BUILDD)%.d:	$(SRCDIR)%.c
+$(BUILDD)%.d: $(SRCDIR)%.c
 	$(CC) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
 
-$(BUILDS)%.o:	$(SRCDIR)%.c
+$(BUILDTEST)%.d: $(TESTDIR)%.c
+	$(CC) $< -I$(SRCDIR) -MM -MT $(@:.d=.o) >$@
+
+$(BUILDS)%.o: $(SRCDIR)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILDD)%.o:	$(SRCDIR)%.c
+$(BUILDD)%.o: $(SRCDIR)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-install: $(SNAME) $(DNAME)
+$(BUILDTEST)%.o: $(TESTDIR)%.c
+	$(CC) -I$(SRCDIR) -c $< -o $@
+
+$(OUTPUTDIR)libpleune_tester: $(OBJSTEST) $(OUTPUTDIR)$(DNAME)
+	$(CC) -L$(OUTPUTDIR) $^ -lpleune -o $@
+
+test: $(OUTPUTDIR)libpleune_tester $(OUTPUTDIR)$(DNAME)
+	LD_LIBRARY_PATH=$(OUTPUTDIR):$LD_LIBRARY_PATH $(OUTPUTDIR)/libpleune_tester
+
+install: $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	mkdir -p /usr/local/lib
 	mkdir -p /usr/local/include
 	install -s $(OUTPUTDIR)$(SNAME) /usr/local/lib/
@@ -55,4 +74,4 @@ uninstall:
 	rm -f /usr/local/include/pleune.h
 
 clean:
-	rm -rf $(BUILDS)* $(BUILDD)* $(OUTPUTDIR)*
+	rm -rf $(BUILDS)* $(BUILDD)* $(BUILDTEST)* $(OUTPUTDIR)*
