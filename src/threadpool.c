@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <assert.h>
 
 struct work_queue {
     struct work_queue *next;
@@ -26,11 +27,15 @@ struct threadpool {
 
     pthread_t threads[256];
     struct work_queue *queue;
+
+    //protects queue
     pthread_mutex_t mut;
 
+    //used to notify worker() of new work
     pthread_cond_t cond;
     pthread_mutex_t cond_mut;
 
+    //used to notify tpool_flush() of work being finished
     pthread_cond_t flush;
     pthread_mutex_t flush_mut;
 };
@@ -45,12 +50,15 @@ worker(void *arg)
     while(data->stop == 0)
     {
         if(data->queue == 0)
-            while(data->paused || !data->queue)
+            while((data->paused || !data->queue) && !data->stop)
             {
                 pthread_mutex_lock(&data->cond_mut);
                 pthread_cond_wait(&data->cond, &data->cond_mut);
                 pthread_mutex_unlock(&data->cond_mut);
             }
+
+        if(data->stop)
+            break;
 
         tpool_work_t func = 0;
         void *arg;
@@ -79,6 +87,8 @@ worker(void *arg)
 tpool_t *
 tpool_create(unsigned int threads)
 {
+    assert(threads > 0 && threads <= 256);
+
     tpool_t *ret = malloc(sizeof(struct threadpool));
 
     ret->stop = 0;
@@ -110,6 +120,11 @@ tpool_destroy(tpool_t *t)
 {
     t->stop = 1;
 
+    //wake threads to let them stop
+    pthread_mutex_lock(&t->cond_mut);
+    pthread_cond_broadcast(&t->cond);
+    pthread_mutex_unlock(&t->cond_mut);
+
     size_t i;
     for(i=0; i<t->num_threads; i++)
         pthread_join(t->threads[i], 0);
@@ -121,6 +136,17 @@ tpool_destroy(tpool_t *t)
 
     pthread_cond_destroy(&t->flush);
     pthread_mutex_destroy(&t->flush_mut);
+
+    if(t->queue != 0)
+    {
+        struct work_queue *q = t->queue;
+
+        while(q != 0)
+        {
+            q->used = 0;
+            q = q->next;
+        }
+    }
 
     free(t);
 }
@@ -189,6 +215,7 @@ tpool_resume(tpool_t *t)
 {
     t->paused = 0;
 
+    //notify threads of resume
     pthread_mutex_lock(&t->cond_mut);
     pthread_cond_broadcast(&t->cond);
     pthread_mutex_unlock(&t->cond_mut);
@@ -199,6 +226,7 @@ tpool_flush(tpool_t *t)
 {
     while(t->queue != 0)//single read needs no mutex lock.
     {
+        //wait for update
         pthread_mutex_lock(&t->flush_mut);
         pthread_cond_wait(&t->flush, &t->flush_mut);
         pthread_mutex_unlock(&t->flush_mut);
