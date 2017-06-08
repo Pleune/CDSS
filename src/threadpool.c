@@ -45,6 +45,7 @@ static struct queue_pool pool = {{{0, 0, 0, 0}}, 0};
 static void *
 worker(void *arg)
 {
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, 0);
     tpool_t *data = arg;
 
     while(data->stop == 0)
@@ -91,25 +92,81 @@ tpool_create(unsigned int threads)
 
     tpool_t *ret = malloc(sizeof(struct threadpool));
 
+    if(ret == 0)
+        return 0;
+
     ret->stop = 0;
     ret->queue = 0;
     ret->paused = 0;
 
     ret->num_threads = threads;
 
-    pthread_mutex_init(&ret->mut, 0);
+    int status;
 
-    pthread_cond_init(&ret->cond, 0);
-    pthread_mutex_init(&ret->cond_mut, 0);
+    status = pthread_mutex_init(&ret->mut, 0);
+    if(status != 0)
+    {
+        free(ret);
+        return 0;
+    }
 
-    pthread_cond_init(&ret->flush, 0);
-    pthread_mutex_init(&ret->flush_mut, 0);
+    status = pthread_cond_init(&ret->cond, 0);
+    if(status != 0)
+    {
+        free(ret);
+        pthread_mutex_destroy(&ret->mut);
+        return 0;
+    }
+
+    status = pthread_mutex_init(&ret->cond_mut, 0);
+    if(status != 0)
+    {
+        free(ret);
+        pthread_mutex_destroy(&ret->mut);
+        pthread_cond_destroy(&ret->cond);
+        return 0;
+    }
+
+    status = pthread_cond_init(&ret->flush, 0);
+    if(status != 0)
+    {
+        free(ret);
+        pthread_mutex_destroy(&ret->mut);
+        pthread_cond_destroy(&ret->cond);
+        pthread_mutex_destroy(&ret->cond_mut);
+        return 0;
+    }
+
+    status = pthread_mutex_init(&ret->flush_mut, 0);
+    if(status != 0)
+    {
+        free(ret);
+        pthread_mutex_destroy(&ret->mut);
+        pthread_cond_destroy(&ret->cond);
+        pthread_mutex_destroy(&ret->cond_mut);
+        pthread_cond_destroy(&ret->flush);
+        return 0;
+    }
+
 
     size_t i;
     for(i=0; i<threads; i++)
     {
-        pthread_create(&ret->threads[i], 0, &worker, ret);
-        pthread_detach(ret->threads[i]);
+        int status = pthread_create(&ret->threads[i], 0, &worker, ret);
+        if(status != 0)
+        {
+            size_t j;
+            for(j=0; j<i; j++)
+                pthread_cancel(ret->threads[i]);
+
+            free(ret);
+            pthread_mutex_destroy(&ret->mut);
+            pthread_cond_destroy(&ret->cond);
+            pthread_mutex_destroy(&ret->cond_mut);
+            pthread_cond_destroy(&ret->flush);
+            pthread_mutex_destroy(&ret->flush_mut);
+            return 0;
+        }
     }
 
     return ret;
