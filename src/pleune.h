@@ -2,6 +2,7 @@
 #define PLEUNE_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -11,10 +12,29 @@
 extern "C" {
 #endif
 
+enum plog_level {
+    L_DEBUG = 1,
+    L_INFO = 2,
+    L_WARN = 3,
+    L_ERROR = 4,
+    L_FATAL = 5
+};
+
+enum plog_stream {
+    S_PRIMARY = 0,
+    S_SECONDARY = 1
+};
+
 typedef struct ringbuff ringbuff_t;
 
 typedef struct threadpool tpool_t;
 typedef void (*tpool_work_t)(void *);
+
+
+void plog(enum plog_level, const char *msg, ...);
+void plog_set_level(enum plog_level);
+void plog_set_stream(enum plog_stream s, FILE *);
+void plog_flush();
 
 
 ringbuff_t *ringbuff_create(size_t capacity);

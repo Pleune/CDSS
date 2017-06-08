@@ -7,6 +7,7 @@
 
 #include "threadpool.h"
 #include "ringbuff.h"
+#include "logger.h"
 
 typedef int (*work_t)(void);
 
@@ -14,18 +15,20 @@ typedef struct {
     work_t func;
     const char *name;
     int seconds;
+    int expected_bad_return;
     int expected_signal;
 } test_t;
 
 test_t test_list[] = {
-    {&test_tpool_basic,           "Thread Pool - Basic",           1, 0},
-    {&test_tpool_max_threads,     "Thread Pool - Max Threads",     1, 0},
-    {&test_tpool_invalid_threads, "Thread Pool - Invalid Threads", 1, SIGABRT},
-    {&test_ringbuff_basic,        "Ring Buffer - Basic", 1, 0}
+    {&test_tpool_basic,           "Thread Pool - Basic",           1, 0, 0},
+    {&test_tpool_max_threads,     "Thread Pool - Max Threads",     1, 0, 0},
+    {&test_tpool_invalid_threads, "Thread Pool - Invalid Threads", 1, 0, SIGABRT},
+    {&test_ringbuff_basic,        "Ring Buffer - Basic", 1, 0, 0},
+    {&test_logger_basic,          "Logger - Basic", 1, 1, 0}
 };
 
 int
-runtest(work_t func, int seconds, int expected_signal, int log)
+runtest(test_t test, int log)
 {
     pid_t f = fork();
 
@@ -37,27 +40,29 @@ runtest(work_t func, int seconds, int expected_signal, int log)
             dup2(log, 2);
         }
 
-        alarm(seconds);
-        exit(func());
+        alarm(test.seconds);
+        exit(test.func());
     } else {
         int status;
         waitpid(f, &status, 0);
 
         if(WIFSIGNALED(status))
         {
-            if(WTERMSIG(status) == expected_signal)
+            if(WTERMSIG(status) == test.expected_signal)
                 return 0;
             else if(WTERMSIG(status) == SIGALRM)
                 return 99; //TIMEOUT
-            else if(expected_signal != 0)
+            else if(test.expected_signal != 0)
                 return 98; //WRONG SIGNAL
             else
                 return 97; //UNEXPECTED SIGNAL
-        } else if(expected_signal != 0)
+        } else if(test.expected_signal != 0)
         {
             return 96; //EXPECTED SIGNAL
         } else {
-            return WEXITSTATUS(status);
+            return test.expected_bad_return ?
+                !WEXITSTATUS(status) :
+                WEXITSTATUS(status);
         }
     }
 }
@@ -78,9 +83,7 @@ main(int argc, char **argv)
         printf("[\033[32mSTARTING\033[0m] %s...    ", test_list[i].name);
         fflush(stdout);
 
-        int status = runtest(test_list[i].func,
-                             test_list[i].seconds,
-                             test_list[i].expected_signal,
+        int status = runtest(test_list[i],
                              log_fd);
 
         const char *message;
