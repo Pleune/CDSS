@@ -6,6 +6,7 @@
 #include <fcntl.h>
 
 #include "threadpool.h"
+#include "ringbuff.h"
 
 typedef int (*work_t)(void);
 
@@ -19,7 +20,8 @@ typedef struct {
 test_t test_list[] = {
     {&test_tpool_basic,           "Thread Pool - Basic",           1, 0},
     {&test_tpool_max_threads,     "Thread Pool - Max Threads",     1, 0},
-    {&test_tpool_invalid_threads, "Thread Pool - Invalid Threads", 1, SIGABRT}
+    {&test_tpool_invalid_threads, "Thread Pool - Invalid Threads", 1, SIGABRT},
+    {&test_ringbuff_basic,        "Ring Buffer - Basic", 1, 0}
 };
 
 int
