@@ -58,7 +58,7 @@ $(BUILDTEST)%.o: $(TESTDIR)%.c
 $(OUTPUTDIR)libpleune_tester: $(OBJSTEST) $(OUTPUTDIR)$(DNAME)
 	$(CC) -L$(OUTPUTDIR) $^ -lpleune -o $@
 
-test: $(OUTPUTDIR)libpleune_tester $(OUTPUTDIR)$(DNAME)
+test: $(OUTPUTDIR)libpleune_tester $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	LD_LIBRARY_PATH=$(OUTPUTDIR):$LD_LIBRARY_PATH $(OUTPUTDIR)/libpleune_tester
 
 install: $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
