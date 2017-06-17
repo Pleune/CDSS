@@ -8,6 +8,7 @@
 #include "threadpool.h"
 #include "ringbuff.h"
 #include "logger.h"
+#include "mempool.h"
 
 typedef int (*work_t)(void);
 
@@ -24,7 +25,8 @@ test_t test_list[] = {
     {&test_tpool_max_threads,     "Thread Pool - Max Threads",     1, 0, 0},
     {&test_tpool_invalid_threads, "Thread Pool - Invalid Threads", 1, 0, SIGABRT},
     {&test_ringbuff_basic,        "Ring Buffer - Basic", 1, 0, 0},
-    {&test_logger_basic,          "Logger - Basic", 1, 1, 0}
+    {&test_logger_basic,          "Logger - Basic", 1, 1, 0},
+    {&test_mempool_basic,         "Mempool - Basic", 1, 0, 0}
 };
 
 int

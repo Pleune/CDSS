@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+typedef struct mempool mempool_t;
+
 enum plog_level {
     L_DEBUG = 1,
     L_INFO = 2,
@@ -29,6 +31,12 @@ typedef struct ringbuff ringbuff_t;
 
 typedef struct threadpool tpool_t;
 typedef void (*tpool_work_t)(void *);
+
+
+mempool_t *mempool_create(size_t block_size, size_t object_size, size_t alignment);
+void mempool_destroy(mempool_t *);
+void *mempool_alloc(mempool_t *);
+void mempool_free(mempool_t *, void *);
 
 
 void plog(enum plog_level, const char *msg, ...);
