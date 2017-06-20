@@ -76,7 +76,7 @@ mpool_grow_create(size_t block_size, size_t object_size, size_t alignment)
     ((struct mpool_grow *)ret)->next_free = next = this = ret + HEADER_SIZE(alignment, ret);
 
     //build free list
-    while(next <= end - object_size)//next has room to be an object
+    while(next < end - object_size)//next has room to be an object
     {
         this = next;
         next += object_size;
