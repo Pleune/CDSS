@@ -24,7 +24,8 @@ int test_ringbuff_basic(void)
         if(strncmp(returned, origional, 27) != 0)
             return 1;
     }
-    return ringbuff_empty(buff) ? 0 : 1;
+
+    if (!ringbuff_empty(buff)) return 1;
 
     //test overflow stability
     for(int i=0; i<100; i++)
@@ -32,6 +33,8 @@ int test_ringbuff_basic(void)
 
     for(int i=0; i<100; i++)
         ringbuff_remove(buff, 0, 27);
+
+    ringbuff_destroy(buff);
 
     return 0;
 }
