@@ -4,12 +4,15 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "threadpool.h"
 #include "ringbuff.h"
 #include "logger.h"
 #include "mpool_grow.h"
 #include "mpool_static.h"
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 typedef int (*work_t)(void);
 
@@ -74,6 +77,21 @@ runtest(test_t test, int log)
 int
 main(int argc, char **argv)
 {
+    int i;
+    int exec_test = -1;
+    for(i=0; i<argc; i++)
+    {
+        if(strncmp(argv[i], "-t", MIN(2, strlen(argv[i]))) == 0)
+        {
+            argv[i] += 2;
+            if(strlen(argv[i]) >= 1)
+                exec_test = atoi(argv[i]);
+        }
+    }
+
+    if(exec_test >= 0 && exec_test < (int)(sizeof(test_list)/sizeof(test_list[0])))
+        return test_list[exec_test].func();
+
     int log_fd = open("test.log",
                       O_RDWR | O_TRUNC | O_CREAT,
                       S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -81,10 +99,9 @@ main(int argc, char **argv)
     const int num_tests = sizeof(test_list)/sizeof(test_list[0]);
     int num_failed = 0;
 
-    int i;
     for(i=0; i<num_tests; i++)
     {
-        printf("[\033[32mSTARTING\033[0m] %s...    ", test_list[i].name);
+        printf("[\033[32mSTARTING\033[0m] %i %s...    ", (int) i, test_list[i].name);
         fflush(stdout);
 
         int status = runtest(test_list[i],
