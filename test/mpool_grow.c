@@ -1,4 +1,4 @@
-#include "mempool.h"
+#include "mpool_grow.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -6,15 +6,15 @@
 #include "pleune.h"
 
 int
-test_mempool_basic(void)
+test_mpool_grow_basic(void)
 {
-    mempool_t *pool = mempool_create(1024, sizeof(int), 8);
+    mpool_grow_t *pool = mpool_grow_create(1024, sizeof(int), 8);
     int **pointers = malloc(10000*sizeof(int *));
     size_t i;
 
     //linear test
     for(i=0; i<10000; i++)
-        pointers[i] = mempool_alloc(pool);
+        pointers[i] = mpool_grow_alloc(pool);
 
     for(i=0; i<10000; i++)
         pointers[i][0] = i;
@@ -23,7 +23,7 @@ test_mempool_basic(void)
         if(pointers[i][0] != (int)i) return 1;
 
     for(i=0; i<10000; i++)
-        mempool_free(pool, pointers[i]);
+        mpool_grow_free(pool, pointers[i]);
 
 
     //errotic test to scramble free list
@@ -39,10 +39,10 @@ test_mempool_basic(void)
         if(pointers[j])
         {
             if(pointers[j][0] != (int)j) return 1;
-            mempool_free(pool, pointers[j]);
+            mpool_grow_free(pool, pointers[j]);
             pointers[j] = 0;
         } else {
-            pointers[j] = mempool_alloc(pool);
+            pointers[j] = mpool_grow_alloc(pool);
             pointers[j][0] = j;
         }
     }
@@ -52,11 +52,11 @@ test_mempool_basic(void)
         if(pointers[i])
         {
             if(pointers[i][0] != (int)i) return 1;
-            mempool_free(pool, pointers[i]);
+            mpool_grow_free(pool, pointers[i]);
         }
     }
 
-    mempool_destroy(pool);
+    mpool_grow_destroy(pool);
     free(pointers);
 
     return 0;

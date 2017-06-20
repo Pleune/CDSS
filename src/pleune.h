@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-typedef struct mempool mempool_t;
+typedef struct mpool_grow mpool_grow_t;
 
 enum plog_level {
     L_DEBUG = 1,
@@ -33,10 +33,10 @@ typedef struct threadpool tpool_t;
 typedef void (*tpool_work_t)(void *);
 
 
-mempool_t *mempool_create(size_t block_size, size_t object_size, size_t alignment);
-void mempool_destroy(mempool_t *);
-void *mempool_alloc(mempool_t *);
-void mempool_free(mempool_t *, void *);
+mpool_grow_t *mpool_grow_create(size_t block_size, size_t object_size, size_t alignment);
+void mpool_grow_destroy(mpool_grow_t *);
+void *mpool_grow_alloc(mpool_grow_t *);
+void mpool_grow_free(mpool_grow_t *, void *);
 
 
 void plog(enum plog_level, const char *msg, ...);
