@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 typedef struct mpool_grow mpool_grow_t;
+typedef struct mpool_static mpool_static_t;
 
 enum plog_level {
     L_DEBUG = 1,
@@ -39,6 +40,12 @@ void *mpool_grow_alloc(mpool_grow_t *);
 void mpool_grow_free(mpool_grow_t *, void *);
 
 
+mpool_static_t *mpool_static_create(size_t pool_size, size_t object_size, size_t alignment);
+static inline void mpool_static_destroy(mpool_static_t *m) {free(m);}
+void *mpool_static_alloc(mpool_static_t *);
+void mpool_static_free(mpool_static_t *, void *);
+
+
 void plog(enum plog_level, const char *msg, ...);
 void plog_set_level(enum plog_level);
 void plog_set_stream(enum plog_stream s, FILE *);
@@ -46,11 +53,11 @@ void plog_flush();
 
 
 ringbuff_t *ringbuff_create(size_t capacity);
-inline void ringbuff_destroy(ringbuff_t *r) {free(r);}
+static inline void ringbuff_destroy(ringbuff_t *r) {free(r);}
 size_t ringbuff_remaining(ringbuff_t *);
 size_t ringbuff_used(ringbuff_t *);
 int ringbuff_empty(ringbuff_t *);
-inline int ringbuff_full(ringbuff_t *r) {return ringbuff_remaining(r) == 0;}
+static inline int ringbuff_full(ringbuff_t *r) {return ringbuff_remaining(r) == 0;}
 void ringbuff_put(ringbuff_t *, const void *mem, size_t bytes);
 void ringbuff_remove(ringbuff_t *, void *mem, size_t bytes);
 
