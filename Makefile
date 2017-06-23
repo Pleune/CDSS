@@ -53,10 +53,10 @@ $(BUILDD)%.o: $(SRCDIR)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDTEST)%.o: $(TESTDIR)%.c
-	$(CC) -I$(SRCDIR) -c $< -o $@
+	$(CC) -g -I$(SRCDIR) -c $< -o $@
 
 $(OUTPUTDIR)libpleune_tester: $(OBJSTEST) $(OUTPUTDIR)$(DNAME)
-	$(CC) -L$(OUTPUTDIR) $^ -lpleune -o $@
+	$(CC) -g -L$(OUTPUTDIR) $^ -lpleune -o $@
 
 test: $(OUTPUTDIR)libpleune_tester $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	LD_LIBRARY_PATH=$(OUTPUTDIR):$LD_LIBRARY_PATH $(OUTPUTDIR)/libpleune_tester
