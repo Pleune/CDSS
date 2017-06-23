@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 
+typedef struct mpool_dynamic mpool_dynamic_t;
 typedef struct mpool_grow mpool_grow_t;
 typedef struct mpool_static mpool_static_t;
 
@@ -32,6 +33,13 @@ typedef struct ringbuff ringbuff_t;
 
 typedef struct threadpool tpool_t;
 typedef void (*tpool_work_t)(void *);
+
+
+mpool_dynamic_t *mpool_dynamic_create(size_t block_size, size_t object_size, size_t alignment);
+void mpool_dynamic_destroy(mpool_dynamic_t *);
+void *mpool_dynamic_alloc(mpool_dynamic_t *);
+void mpool_dynamic_free(mpool_dynamic_t *, void *);
+size_t mpool_dynamic_blocks(mpool_dynamic_t *);
 
 
 mpool_grow_t *mpool_grow_create(size_t block_size, size_t object_size, size_t alignment);

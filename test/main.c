@@ -11,6 +11,7 @@
 #include "logger.h"
 #include "mpool_grow.h"
 #include "mpool_static.h"
+#include "mpool_dynamic.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -31,7 +32,8 @@ test_t test_list[] = {
     {&test_ringbuff_basic,        "Ring Buffer",                   1, 0, 0},
     {&test_logger_basic,          "Logger",                        1, 1, 0},
     {&test_mpool_grow_basic,      "Mem Pool (Grow)",               1, 0, 0},
-    {&test_mpool_static_basic,    "Mem Pool (Static)",             1, 0, 0}
+    {&test_mpool_static_basic,    "Mem Pool (Static)",             1, 0, 0},
+    {&test_mpool_dynamic_basic,   "Mem Pool (Dynamic)",            9, 0, 0}
 };
 
 int
