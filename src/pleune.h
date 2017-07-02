@@ -34,6 +34,8 @@ typedef struct ringbuff ringbuff_t;
 typedef struct threadpool tpool_t;
 typedef void (*tpool_work_t)(void *);
 
+typedef struct voxtree voxtree_t;
+
 
 mpool_dynamic_t *mpool_dynamic_create(size_t block_size, size_t object_size, size_t alignment);
 void mpool_dynamic_destroy(mpool_dynamic_t *);
@@ -76,6 +78,36 @@ void tpool_add(tpool_t *, tpool_work_t, void *arg, int front);
 void tpool_pause(tpool_t *);
 void tpool_resume(tpool_t *);
 void tpool_flush(tpool_t *);
+
+
+/* If alloc_func and free_func are suppplied, then alloc func is called
+ * with the single argument func_arg1 to allocate a block of the
+ * correct size (see: voxtree_get_alloc_size). The function free_func
+ * is called with the first argument func_arg1, and the second
+ * argument the pointer returned by alloc_func to free these blocks of
+ * data.
+ *
+ * This is intended to be used with the mpool objects above, but any
+ * simmilar functions may be used.
+ */
+voxtree_t *voxtree_create(unsigned depth,
+                          void *(*alloc_func)(void *),
+                          void (*free_func)(void *, void *),
+                          void *func_arg1,
+                          size_t data_size);
+void voxtree_destroy(voxtree_t *);
+void voxtree_get(voxtree_t *tree,
+                 unsigned long x,
+                 unsigned long y,
+                 unsigned long z,
+                 void *data);
+void voxtree_set(voxtree_t *tree,
+                 unsigned long x,
+                 unsigned long y,
+                 unsigned long z,
+                 void *data);
+size_t voxtree_get_alloc_size(size_t data_size);
+long long voxtree_count_nodes(voxtree_t *tree);
 
 #ifdef __cplusplus
 }
