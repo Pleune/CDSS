@@ -19,7 +19,7 @@ mpool_static_create(size_t pool_size, size_t object_size, size_t alignment)
     ret->next_free = this = next = ((void *)ret) + OBJECT_SIZE(alignment, sizeof(struct mpool_static));
     object_size = OBJECT_SIZE(alignment, object_size);
 
-    while(this < end - object_size)
+    while(next <= end - object_size)
     {
         this = next;
         next += object_size;

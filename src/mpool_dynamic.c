@@ -36,7 +36,7 @@ mpool_dynamic_create(size_t block_size, size_t object_size, size_t alignment)
     ret->alignment = alignment;
     ret->num_objects = 0;
 
-    while(this < end - object_size)
+    while(next <= end - object_size)
     {
         this = next;
         next += object_size;
