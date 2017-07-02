@@ -55,7 +55,14 @@ runtest(test_t test, int log)
         }
 
         alarm(test.seconds);
-        exit(test.func());
+
+        clock_t before = clock();
+        int ret = test.func();
+        clock_t after = clock();
+
+        printf("Finished test \"%s\" in %f seconds.\r\n", test.name, (float)(after-before)/CLOCKS_PER_SEC);
+
+        exit(ret);
     } else {
         int status;
         waitpid(f, &status, 0);
