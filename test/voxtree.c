@@ -1,7 +1,8 @@
 #include "voxtree.h"
 
-#include "stdlib.h"
-#include "time.h"
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
 
 #include "pleune.h"
 
@@ -119,6 +120,32 @@ test_voxtree_mpool(void)
 
     if(voxtree_count_nodes(tree) > 1)
         return 1;
+
+    voxtree_destroy(tree);
+    mpool_grow_destroy(pool);
+
+    return 0;
+}
+
+int
+test_voxtree_sphere(void)
+{
+    mpool_grow_t *pool = mpool_grow_create(1024*64, voxtree_get_alloc_size(sizeof(int)), 8);
+    voxtree_t *tree = voxtree_create(10,
+                                     (void *)mpool_grow_alloc,
+                                     (void *)mpool_grow_free, pool,
+                                     sizeof(int));//1024x1024x1024
+
+    unsigned x, y, z;
+    int t = 1;
+
+    for(x=0; x<1024; x++)
+    for(y=0; y<1024; y++)
+    for(z=0; z<1024; z++)
+    {
+        if(sqrt(x*x + y*y + z*z) < 700)
+            voxtree_set(tree, x, y, z, &t);
+    }
 
     voxtree_destroy(tree);
     mpool_grow_destroy(pool);
