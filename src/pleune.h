@@ -31,6 +31,8 @@ enum plog_stream {
 
 typedef struct ringbuff ringbuff_t;
 
+typedef struct stack stack_t;
+
 typedef struct threadpool tpool_t;
 typedef void (*tpool_work_t)(void *);
 
@@ -72,6 +74,23 @@ void ringbuff_put(ringbuff_t *, const void *mem, size_t bytes);
 void ringbuff_remove(ringbuff_t *, void *mem, size_t bytes);
 
 
+stack_t *stack_create(size_t object_size, size_t object_count, double resize_factor);
+void stack_destroy(stack_t *stack);
+void stack_push(stack_t *stack, const void *data);
+void *stack_pop(stack_t *stack, void *data);
+size_t stack_objects_get_num(stack_t *stack);
+void stack_push_mult(stack_t *stack, const void *data, size_t count);
+void stack_advance(stack_t *stack, size_t count);
+void stack_trim(stack_t *stack);
+void stack_resize(stack_t *stack, size_t num_elements);
+void stack_ensure_size(stack_t *stack, size_t num_elements);
+void *stack_element_ref(stack_t *stack, size_t index);
+//delete index by replacing it with the last element
+//returns the ref to index, or 0 on error
+void *stack_element_replace_from_end(stack_t *stack, size_t index);
+void *stack_transform_dataptr(stack_t *stack);
+
+
 tpool_t *tpool_create(unsigned int threads);
 void tpool_destroy(tpool_t *);
 void tpool_add(tpool_t *, tpool_work_t, void *arg, int front);
@@ -108,6 +127,7 @@ void voxtree_set(voxtree_t *tree,
                  void *data);
 size_t voxtree_get_alloc_size(size_t data_size);
 long long voxtree_count_nodes(voxtree_t *tree);
+
 
 #ifdef __cplusplus
 }

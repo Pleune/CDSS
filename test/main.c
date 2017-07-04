@@ -14,6 +14,7 @@
 #include "mpool_static.h"
 #include "mpool_dynamic.h"
 #include "voxtree.h"
+#include "stack.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -39,7 +40,9 @@ test_t test_list[] = {
     {&test_voxtree_basic,         "Voxtree - Basic",               9, 0, 0},
     {&test_voxtree_noise,         "Voxtree - Noise",               9, 0, 0},
     {&test_voxtree_mpool,         "Voxtree - mpool",               9, 0, 0},
-    {&test_voxtree_sphere,        "Voxtree - Sphere",              90, 0, 0}
+    {&test_voxtree_sphere,        "Voxtree - Sphere",              90, 0, 0},
+    {&test_stack_basic,           "Stack - Basic",                 1, 0, 0},
+    {&test_stack_advanced,        "Stack - Advanced",              1, 0, 0}
 };
 
 int
