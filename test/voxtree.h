@@ -3,7 +3,6 @@
 
 int test_voxtree_basic(void);
 int test_voxtree_noise(void);
-int test_voxtree_mpool(void);
 int test_voxtree_sphere(void);
 
 #endif
