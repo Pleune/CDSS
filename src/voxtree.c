@@ -65,30 +65,6 @@ voxtree_create(unsigned depth,
     return ret;
 }
 
-static void
-free_children(struct voxtree_n *children,
-                      void (*free_func)(void *, void *),
-                      void *free_arg1,
-                      size_t node_size)
-{
-    unsigned i;
-
-    for(i=0; i<8; i++)
-    {
-        struct voxtree_n *child = ((void *)children + node_size);
-        if(!child->isleaf)
-            free_children(child->children,
-                          free_func,
-                          free_arg1,
-                          node_size);
-    }
-
-    if(free_func)
-        free_func(free_arg1, children);
-    else
-        free(children);
-}
-
 void
 voxtree_destroy(voxtree_t *tree)
 {
@@ -97,10 +73,39 @@ voxtree_destroy(voxtree_t *tree)
     size_t node_size = tree->node_size;
 
     if(!tree->node->isleaf)
-        free_children(tree->node->children,
-                      free_func,
-                      free_arg1,
-                      node_size);
+    {
+        struct voxtree_n *node = 0;
+        struct voxtree_n *node_stack[tree->depth*80 + 1];
+        unsigned node_stack_index = 1;
+        node_stack[0] = tree->node;
+
+        while(node_stack_index > 0)
+        {
+            node = node_stack[node_stack_index-1];
+
+            unsigned found_branch = 0;
+            unsigned i;
+            for(i=0; i<8; i++)
+            {
+                if(!((struct voxtree_n *)(node->children + i*node_size))->isleaf)
+                {
+                    found_branch = 1;
+                    node_stack[node_stack_index++] = node->children + i*node_size;
+                }
+            }
+
+            if(!found_branch)
+            {
+                if(free_func)
+                    free_func(free_arg1, node->children);
+                else
+                    free(node->children);
+
+                node->isleaf = 1;
+                node_stack_index--;
+            }
+        }
+    }
 
     if(free_func)
         free_func(free_arg1, tree->node);
@@ -130,9 +135,9 @@ voxtree_get(voxtree_t *tree, unsigned long x, unsigned long y, unsigned long z, 
     while(!node->isleaf)
     {
         node = node->children + node_size* (
-            (x >= half_width ? 0b001 : 0) |
-            (y >= half_width ? 0b010 : 0) |
-            (z >= half_width ? 0b100 : 0));
+            ((x >= half_width)     ) |
+            ((y >= half_width) << 1) |
+            ((z >= half_width) << 2));
 
         x = (x << 1) & not_width;
         y = (y << 1) & not_width;
