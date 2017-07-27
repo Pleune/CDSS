@@ -112,20 +112,18 @@ void tpool_flush(tpool_t *);
 voxtree_t *voxtree_create(unsigned depth,
                           void *(*alloc_func)(void *),
                           void (*free_func)(void *, void *),
-                          void *func_arg1,
-                          size_t data_size);
+                          void *func_arg1);
 void voxtree_destroy(voxtree_t *);
-void voxtree_get(voxtree_t *tree,
+void *voxtree_get(voxtree_t *tree,
                  unsigned long x,
                  unsigned long y,
-                 unsigned long z,
-                 void *data);
+                  unsigned long z);
 void voxtree_set(voxtree_t *tree,
                  unsigned long x,
                  unsigned long y,
                  unsigned long z,
                  void *data);
-size_t voxtree_get_alloc_size(size_t data_size);
+size_t voxtree_get_alloc_size();
 long long voxtree_count_nodes(voxtree_t *tree);
 
 
