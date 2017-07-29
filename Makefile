@@ -53,13 +53,14 @@ $(BUILDD)%.o: $(SRCDIR)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDTEST)%.o: $(TESTDIR)%.c
-	$(CC) -g -O3 -I$(SRCDIR) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(SRCDIR) -c $< -o $@
 
 $(OUTPUTDIR)libpleune_tester: $(OBJSTEST) $(OUTPUTDIR)$(SNAME)
-	$(CC) -g -O3 -L$(OUTPUTDIR) $^ -lm $(OUTPUTDIR)libpleune.a -pthread -o $@
+	$(CC) $(LFLAGS) -L$(OUTPUTDIR) $^ -lm $(OUTPUTDIR)libpleune.a -pthread -o $@
 
 test: $(OUTPUTDIR)libpleune_tester $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	LD_LIBRARY_PATH=$(OUTPUTDIR):$LD_LIBRARY_PATH $(OUTPUTDIR)/libpleune_tester
+	grep Finished test.log
 
 install: $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	mkdir -p /usr/local/lib
