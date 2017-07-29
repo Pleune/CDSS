@@ -127,17 +127,18 @@ void
 voxtree_set(voxtree_t *tree, unsigned long x, unsigned long y, unsigned long z, void *data)
 {
     register unsigned long half_width = 1 << (tree->depth - 1);
-    unsigned long width = 2*half_width;
 
-    assert(x < width);
-    assert(y < width);
-    assert(z < width);
+    assert(x < 2*half_width);//assert improves performance
+    assert(y < 2*half_width);
+    assert(z < 2*half_width);
+
+    alloc_t allocator = tree->allocator;
 
     unsigned node_stack_index = 0;
     struct voxtree_n *node_stack[tree->depth];
 
     register struct voxtree_n *node = &tree->node;
-    register unsigned long not_width = ~width;
+    register unsigned long not_width = ~(2*half_width);
 
     //step 1: find lowest leaf.
     while(!node->isleaf)
@@ -163,14 +164,13 @@ voxtree_set(voxtree_t *tree, unsigned long x, unsigned long y, unsigned long z, 
         struct voxtree_n tmp = *node;
         node->isleaf = 0;
 
-
         if(tree->use_allocator)
-            if(tree->allocator.type == ALLOC_SYM)
+            if(allocator.type == ALLOC_SYM)
                 node->u.children =
-                    tree->allocator.u.symmetric.alloc(tree->allocator.u.symmetric.argument);
+                    allocator.u.symmetric.alloc(allocator.u.symmetric.argument);
             else
                 node->u.children =
-                    tree->allocator.u.asymmetric.alloc(tree->allocator.u.asymmetric.argument,
+                    allocator.u.asymmetric.alloc(allocator.u.asymmetric.argument,
                                                        sizeof(struct voxtree_n)*8);
         else
             node->u.children = malloc(sizeof(struct voxtree_n)*8);
@@ -214,13 +214,12 @@ voxtree_set(voxtree_t *tree, unsigned long x, unsigned long y, unsigned long z, 
                 return;
         }
 
-
         if(tree->use_allocator)
-            if(tree->allocator.type == ALLOC_SYM)
-                tree->allocator.u.symmetric.free(tree->allocator.u.symmetric.argument,
+            if(allocator.type == ALLOC_SYM)
+                allocator.u.symmetric.free(allocator.u.symmetric.argument,
                                                  node->u.children);
             else
-                tree->allocator.u.asymmetric.free(tree->allocator.u.asymmetric.argument,
+                allocator.u.asymmetric.free(allocator.u.asymmetric.argument,
                                                   node->u.children);
         else
             free(node->u.children);
