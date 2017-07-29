@@ -9,7 +9,7 @@
 int
 test_voxtree_basic(void)
 {
-    voxtree_t *tree = voxtree_create(5, 0, 0, 0);//32x32x32
+    voxtree_t *tree = voxtree_create(5, 0);//32x32x32
 
     void *i = (void *)100;
     voxtree_set(tree, 10, 20, 10, i);
@@ -31,7 +31,7 @@ test_voxtree_basic(void)
 int
 test_voxtree_noise(void)
 {
-    voxtree_t *tree = voxtree_create(5, 0, 0, 0);//32x32x32
+    voxtree_t *tree = voxtree_create(5, 0);//32x32x32
 
     void *data[32][32][32] = {{{0}}};
 
@@ -81,7 +81,8 @@ int
 test_voxtree_mpool(void)
 {
     mpool_grow_t *pool = mpool_grow_create(4096*16, voxtree_get_alloc_size(), 8);
-    voxtree_t *tree = voxtree_create(5, (void *)mpool_grow_alloc, (void *)mpool_grow_free, pool);//32x32x32
+    alloc_t allocator = mpool_grow_allocator(pool);
+    voxtree_t *tree = voxtree_create(5, &allocator);//32x32x32
 
     void *data[32][32][32] = {{{0}}};
 
@@ -132,9 +133,8 @@ int
 test_voxtree_sphere(void)
 {
     mpool_grow_t *pool = mpool_grow_create(1024*64, voxtree_get_alloc_size(), 8);
-    voxtree_t *tree = voxtree_create(10,
-                                     (void *)mpool_grow_alloc,
-                                     (void *)mpool_grow_free, pool);//1024x1024x1024
+    alloc_t allocator = mpool_grow_allocator(pool);
+    voxtree_t *tree = voxtree_create(10, &allocator);//1024x1024x1024
 
     unsigned x, y, z;
 

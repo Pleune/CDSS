@@ -12,11 +12,9 @@ struct voxtree_n {
 };
 
 struct voxtree {
-    void *(*alloc_func)(void *);
-    void (*free_func)(void *, void *);
-    void *alloc_arg;
     unsigned depth;
-
+    int use_allocator;
+    alloc_t allocator;
     struct voxtree_n node;
 };
 
@@ -27,18 +25,23 @@ voxtree_get_alloc_size()
 }
 
 voxtree_t *
-voxtree_create(unsigned depth,
-               void *(*alloc_func)(void *),
-               void (*free_func)(void *, void *),
-               void *func_arg1)
+voxtree_create(unsigned depth, alloc_t *allocator)
 {
+    if(allocator && allocator->type == ALLOC_SYM)
+        if(allocator->u.symmetric.size < sizeof(struct voxtree_n)*8)
+            return 0;//some idiot gave us a symmetric allocator that isn't big enough
+
     struct voxtree *ret;
     ret = malloc(sizeof(struct voxtree));
-
-    ret->alloc_func = alloc_func;
-    ret->free_func = free_func;
-    ret->alloc_arg = func_arg1;
     ret->depth = depth;
+
+    if(allocator)
+    {
+        ret->allocator = *allocator;
+        ret->use_allocator = 1;
+    } else {
+        ret->use_allocator = 0;
+    }
 
     ret->node.isleaf = 1;
     ret->node.u.data = 0;
@@ -49,9 +52,6 @@ voxtree_create(unsigned depth,
 void
 voxtree_destroy(voxtree_t *tree)
 {
-    void (*free_func)(void *, void *) = tree->free_func;
-    void *free_arg1 = tree->alloc_arg;
-
     if(!tree->node.isleaf)
     {
         struct voxtree_n *node = 0;
@@ -76,8 +76,13 @@ voxtree_destroy(voxtree_t *tree)
 
             if(!found_branch)
             {
-                if(free_func)
-                    free_func(free_arg1, node->u.children);
+                if(tree->use_allocator)
+                    if(tree->allocator.type == ALLOC_SYM)
+                        tree->allocator.u.symmetric.free(tree->allocator.u.symmetric.argument,
+                                                         node->u.children);
+                    else
+                        tree->allocator.u.asymmetric.free(tree->allocator.u.asymmetric.argument,
+                                                         node->u.children);
                 else
                     free(node->u.children);
 
@@ -158,8 +163,15 @@ voxtree_set(voxtree_t *tree, unsigned long x, unsigned long y, unsigned long z, 
         struct voxtree_n tmp = *node;
         node->isleaf = 0;
 
-        if(tree->alloc_func)
-            node->u.children = tree->alloc_func(tree->alloc_arg);
+
+        if(tree->use_allocator)
+            if(tree->allocator.type == ALLOC_SYM)
+                node->u.children =
+                    tree->allocator.u.symmetric.alloc(tree->allocator.u.symmetric.argument);
+            else
+                node->u.children =
+                    tree->allocator.u.asymmetric.alloc(tree->allocator.u.asymmetric.argument,
+                                                       sizeof(struct voxtree_n)*8);
         else
             node->u.children = malloc(sizeof(struct voxtree_n)*8);
 
@@ -202,8 +214,14 @@ voxtree_set(voxtree_t *tree, unsigned long x, unsigned long y, unsigned long z, 
                 return;
         }
 
-        if(tree->free_func)
-            tree->free_func(tree->alloc_arg, node->u.children);
+
+        if(tree->use_allocator)
+            if(tree->allocator.type == ALLOC_SYM)
+                tree->allocator.u.symmetric.free(tree->allocator.u.symmetric.argument,
+                                                 node->u.children);
+            else
+                tree->allocator.u.asymmetric.free(tree->allocator.u.asymmetric.argument,
+                                                  node->u.children);
         else
             free(node->u.children);
 

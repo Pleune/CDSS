@@ -1,6 +1,6 @@
 #include "pleune.h"
 
-#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 /*
@@ -61,7 +61,9 @@ struct mpool_grow {
 mpool_grow_t *
 mpool_grow_create(size_t block_size, size_t object_size, size_t alignment)
 {
-    assert(alignment > 0);
+    if(alignment < 1)
+        alignment = 1;
+
     object_size = OBJECT_SIZE(alignment, object_size);
     assert(block_size >= sizeof(struct mpool_grow) + object_size + alignment);
 
@@ -124,9 +126,36 @@ mpool_grow_alloc(mpool_grow_t *m)
     return ret;
 }
 
+void *
+mpool_grow_calloc(mpool_grow_t *m)
+{
+    return memset(mpool_grow_alloc(m), 0, m->object_size);
+}
+
 void
 mpool_grow_free(mpool_grow_t *m, void *p)
 {
     *(void **)p = ((struct mpool_grow *)m)->next_free;
     ((struct mpool_grow *)m)->next_free = p;
+}
+
+alloc_t
+mpool_grow_allocator(mpool_grow_t *m)
+{
+    static alloc_t ret = {
+        {
+            .symmetric = {
+                (void *(*)(void *))&mpool_grow_alloc,
+                (void *(*)(void *))&mpool_grow_calloc,
+                (void (*)(void *, void *))&mpool_grow_free,
+                0, 0
+            }
+        },
+        ALLOC_SYM
+    };
+
+    ret.u.symmetric.argument = m;
+    ret.u.symmetric.size = m->object_size;
+
+    return ret;
 }

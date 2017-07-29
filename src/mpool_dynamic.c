@@ -1,5 +1,7 @@
 #include "pleune.h"
 
+#include <string.h>
+
 struct mpool_dynamic {
     void *next_free;
     struct mpool_dynamic *next_block;
@@ -20,6 +22,9 @@ struct mpool_dynamic {
 mpool_dynamic_t *
 mpool_dynamic_create(size_t block_size, size_t object_size, size_t alignment)
 {
+    if(alignment < 1)
+        alignment = 1;
+
     mpool_dynamic_t *ret = malloc(block_size);
     if(!ret) return 0;
 
@@ -81,6 +86,12 @@ mpool_dynamic_alloc(mpool_dynamic_t *m)
     return ret;
 }
 
+void *
+mpool_dynamic_calloc(mpool_dynamic_t *m)
+{
+    return memset(mpool_dynamic_alloc(m), 0, m->object_size);
+}
+
 void
 mpool_dynamic_free(mpool_dynamic_t *m, void *p)
 {
@@ -121,4 +132,25 @@ mpool_dynamic_blocks(mpool_dynamic_t *m)
     }
 
     return i;
+}
+
+alloc_t
+mpool_dynamic_allocator(mpool_dynamic_t *m)
+{
+    static alloc_t ret = {
+        {
+            .symmetric = {
+                (void *(*)(void *))&mpool_dynamic_alloc,
+                (void *(*)(void *))&mpool_dynamic_calloc,
+                (void (*)(void *, void *))&mpool_dynamic_free,
+                0, 0
+            }
+        },
+        ALLOC_SYM
+    };
+
+    ret.u.symmetric.argument = m;
+    ret.u.symmetric.size = m->object_size;
+
+    return ret;
 }

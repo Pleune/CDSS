@@ -15,6 +15,48 @@ extern "C" {
 typedef struct mpool_dynamic mpool_dynamic_t;
 typedef struct mpool_grow mpool_grow_t;
 typedef struct mpool_static mpool_static_t;
+typedef struct ringbuff ringbuff_t;
+typedef struct stack stack_t;
+typedef struct threadpool tpool_t;
+typedef void (*tpool_work_t)(void *);
+typedef struct voxtree voxtree_t;
+
+/*
+ * A general structure to define a set of alloc/free functions.
+ * It does not allow the use of any alloc functions, but a
+ * wrapper for any allocator can be made.
+ *
+ * All allocators in this library will have a function to build
+ * this struct. Furthermore, any function in this library that
+ * asks for a alloc_t pointer will also accept a void pointer,
+ * meaning that function should use malloc/calloc/free from
+ * the standard library.
+ *
+ * Symmetric allocators are those which only return constantly sized
+ * blocks
+ * Asymmetric allocators return blocks of any size, like malloc/calloc
+ * from the standard library
+ */
+
+typedef struct {
+    union {
+        struct {
+            void *(*alloc)(void *arg);
+            void *(*calloc)(void *arg);
+            void (*free)(void *arg, void *);
+            void *argument;
+            size_t size;
+        } symmetric;
+        struct {
+            void *(*alloc)(void *arg, size_t);
+            void *(*calloc)(void *arg, size_t);
+            void (*free)(void *arg, void *);
+            void *argument;
+        } asymmetric;
+    } u;
+
+    enum {ALLOC_SYM, ALLOC_ASYM} type;
+} alloc_t;
 
 enum plog_level {
     L_DEBUG = 1,
@@ -29,33 +71,30 @@ enum plog_stream {
     S_SECONDARY = 1
 };
 
-typedef struct ringbuff ringbuff_t;
-
-typedef struct stack stack_t;
-
-typedef struct threadpool tpool_t;
-typedef void (*tpool_work_t)(void *);
-
-typedef struct voxtree voxtree_t;
-
 
 mpool_dynamic_t *mpool_dynamic_create(size_t block_size, size_t object_size, size_t alignment);
 void mpool_dynamic_destroy(mpool_dynamic_t *);
 void *mpool_dynamic_alloc(mpool_dynamic_t *);
+void *mpool_dynamic_calloc(mpool_dynamic_t *);
 void mpool_dynamic_free(mpool_dynamic_t *, void *);
 size_t mpool_dynamic_blocks(mpool_dynamic_t *);
+alloc_t mpool_dynamic_allocator(mpool_dynamic_t *);
 
 
 mpool_grow_t *mpool_grow_create(size_t block_size, size_t object_size, size_t alignment);
 void mpool_grow_destroy(mpool_grow_t *);
 void *mpool_grow_alloc(mpool_grow_t *);
+void *mpool_grow_calloc(mpool_grow_t *);
 void mpool_grow_free(mpool_grow_t *, void *);
+alloc_t mpool_grow_allocator(mpool_grow_t *);
 
 
 mpool_static_t *mpool_static_create(size_t pool_size, size_t object_size, size_t alignment);
 static inline void mpool_static_destroy(mpool_static_t *m) {free(m);}
 void *mpool_static_alloc(mpool_static_t *);
+void *mpool_static_calloc(mpool_static_t *);
 void mpool_static_free(mpool_static_t *, void *);
+alloc_t mpool_static_allocator(mpool_static_t *);
 
 
 void plog(enum plog_level, const char *msg, ...);
@@ -99,24 +138,11 @@ void tpool_resume(tpool_t *);
 void tpool_flush(tpool_t *);
 
 
-/* If alloc_func and free_func are suppplied, then alloc func is called
- * with the single argument func_arg1 to allocate a block of the
- * correct size (see: voxtree_get_alloc_size). The function free_func
- * is called with the first argument func_arg1, and the second
- * argument the pointer returned by alloc_func to free these blocks of
- * data.
- *
- * This is intended to be used with the mpool objects above, but any
- * simmilar functions may be used.
- */
-voxtree_t *voxtree_create(unsigned depth,
-                          void *(*alloc_func)(void *),
-                          void (*free_func)(void *, void *),
-                          void *func_arg1);
+voxtree_t *voxtree_create(unsigned depth, alloc_t *allocator);
 void voxtree_destroy(voxtree_t *);
 void *voxtree_get(voxtree_t *tree,
-                 unsigned long x,
-                 unsigned long y,
+                  unsigned long x,
+                  unsigned long y,
                   unsigned long z);
 void voxtree_set(voxtree_t *tree,
                  unsigned long x,
