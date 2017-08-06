@@ -7,6 +7,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MODULO(a, b) (((a) % (b) + (b)) % (b))
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,6 +16,8 @@ extern "C" {
 typedef struct mpool_dynamic mpool_dynamic_t;
 typedef struct mpool_grow mpool_grow_t;
 typedef struct mpool_static mpool_static_t;
+typedef struct ntorus ntorus_t;
+typedef void (*ntorus_cb_t)(ntorus_t *, void **data);
 typedef struct ringbuff ringbuff_t;
 typedef struct stack stack_t;
 typedef struct threadpool tpool_t;
@@ -55,7 +58,7 @@ typedef struct {
         } asymmetric;
     } u;
 
-    enum {ALLOC_SYM, ALLOC_ASYM} type;
+    enum {ALLOC_NONE, ALLOC_SYM, ALLOC_ASYM} type;
 } alloc_t;
 
 enum plog_level {
@@ -95,6 +98,28 @@ void *mpool_static_alloc(mpool_static_t *);
 void *mpool_static_calloc(mpool_static_t *);
 void mpool_static_free(mpool_static_t *, void *);
 alloc_t mpool_static_allocator(mpool_static_t *);
+
+
+ntorus_t *ntorus_create(const size_t dimensions,
+                        const size_t size[],
+                        void *default_value,
+                        const alloc_t *allocator);
+static inline void ntorus_destroy(ntorus_t *n) {free(n);}
+void **ntorus_at(ntorus_t *, const size_t pos[]);
+void ntorus_foreach(ntorus_t *,
+                    const size_t low[],
+                    const size_t high[],
+                    ntorus_cb_t cb);//inclusive
+void ntorus_fill(ntorus_t *,
+                 const size_t low[],
+                 const size_t high[],
+                 void *data);//inclusive
+void ntorus_move(ntorus_t *, const size_t pos[]);
+void ntorus_shift(ntorus_t *, const size_t diff[]);
+void ntorus_pos(ntorus_t *, size_t pos[]);
+void ntorus_set_default(ntorus_t *, void *default_value);
+void ntorus_callback_out(ntorus_t *, ntorus_cb_t func);
+void ntorus_callback_in(ntorus_t *, ntorus_cb_t func);
 
 
 void plog(enum plog_level, const char *msg, ...);
