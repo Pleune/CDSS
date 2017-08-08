@@ -40,6 +40,7 @@ test_t test_list[] = {
     {&test_mpool_dynamic_basic,   "Mem Pool (Dynamic)",            9, 0, 0},
     {&test_voxtree_basic,         "Voxtree - Basic",               9, 0, 0},
     {&test_voxtree_noise,         "Voxtree - Noise",               9, 0, 0},
+    {&test_voxtree_high_dim,      "Voxtree - 6-Dim",               9, 0, 0},
     {&test_voxtree_mpool,         "Voxtree - mpool",               9, 0, 0},
     {&test_voxtree_sphere,        "Voxtree - Sphere",              90, 0, 0},
     {&test_stack_basic,           "Stack - Basic",                 1, 0, 0},
