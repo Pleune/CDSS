@@ -65,7 +65,7 @@ test: $(OUTPUTDIR)libpleune_tester $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 install: $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	mkdir -p /usr/local/lib
 	mkdir -p /usr/local/include
-	install -s $(OUTPUTDIR)$(SNAME) /usr/local/lib/
+	install $(OUTPUTDIR)$(SNAME) /usr/local/lib/
 	install -s $(OUTPUTDIR)$(DNAME) /usr/local/lib/
 	install $(SRCDIR)pleune.h /usr/local/include/
 
