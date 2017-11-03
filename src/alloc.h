@@ -40,4 +40,64 @@ typedef struct {
     enum {ALLOC_NONE, ALLOC_SYM, ALLOC_ASYM} type;
 } alloc_t;
 
+extern const alloc_t ALLOC_STDLIB;
+
+inline static void *
+cdss_malloc(const alloc_t *a, const size_t s)
+{
+    switch(a->type)
+    {
+    case ALLOC_SYM:
+        return a->u.symmetric.alloc(a->u.symmetric.argument);
+    case ALLOC_ASYM:
+        return a->u.asymmetric.alloc(a->u.asymmetric.argument, s);
+    case ALLOC_NONE:
+        return malloc(s);
+    }
+
+    return 0;
+}
+
+inline static void *
+cdss_calloc(const alloc_t *a, const size_t s)
+{
+    switch(a->type)
+    {
+    case ALLOC_SYM:
+        return a->u.symmetric.calloc(a->u.symmetric.argument);
+    case ALLOC_ASYM:
+        return a->u.asymmetric.calloc(a->u.asymmetric.argument, s);
+    default:
+        return calloc(1, s);
+    }
+
+    return 0;
+}
+
+inline static void
+cdss_free(const alloc_t *a, void *d)
+{
+    switch(a->type)
+    {
+    case ALLOC_SYM:
+        a->u.symmetric.free(a->u.symmetric.argument, d);
+        return;
+    case ALLOC_ASYM:
+        a->u.asymmetric.free(a->u.asymmetric.argument, d);
+        return;
+    case ALLOC_NONE:
+        free(d);
+        return;
+    }
+}
+
+inline static unsigned
+cdss_alloc_ensure(const alloc_t *a, const size_t s)
+{
+    if(a->type == ALLOC_SYM && a->u.symmetric.size < s)
+        return 0;
+    else
+        return 1;
+}
+
 #endif
