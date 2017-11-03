@@ -1,7 +1,7 @@
 #include "ringbuff.h"
 
 #include <string.h>
-#include "pleune.h"
+#include "cdss.h"
 
 int test_ringbuff_basic(void)
 {

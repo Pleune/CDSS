@@ -67,12 +67,12 @@ install: $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	mkdir -p /usr/local/include
 	install $(OUTPUTDIR)$(SNAME) /usr/local/lib/
 	install -s $(OUTPUTDIR)$(DNAME) /usr/local/lib/
-	install $(SRCDIR)pleune.h /usr/local/include/
+	install $(SRCDIR)cdss.h /usr/local/include/
 
 uninstall:
 	rm -f /usr/local/lib/$(SNAME)
 	rm -f /usr/local/lib/$(DNAME)
-	rm -f /usr/local/include/pleune.h
+	rm -f /usr/local/include/cdss.h
 
 clean:
 	rm -rf $(BUILDS)* $(BUILDD)* $(BUILDTEST)* $(OUTPUTDIR)*
