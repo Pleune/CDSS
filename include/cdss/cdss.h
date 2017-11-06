@@ -8,6 +8,7 @@
 extern "C" {
 #endif
 
+#include "hmap.h"
 #include "mpool_static.h"
 #include "mpool_grow.h"
 #include "mpool_dynamic.h"

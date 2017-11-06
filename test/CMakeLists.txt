@@ -3,6 +3,7 @@ find_package(Threads REQUIRED)
 
 set(SOURCE_FILES
   logger.c
+  hmap.c
   main.c
   mpool_dynamic.c
   mpool_grow.c

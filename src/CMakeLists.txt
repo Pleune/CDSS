@@ -1,5 +1,6 @@
 set(SOURCE_FILES
   alloc.c
+  hmap.c
   logger.c
   mpool_dynamic.c
   mpool_grow.c

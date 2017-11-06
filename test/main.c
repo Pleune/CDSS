@@ -16,6 +16,7 @@
 #include "voxtree.h"
 #include "stack.h"
 #include "ntorus.h"
+#include "hmap.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -45,7 +46,8 @@ test_t test_list[] = {
     {&test_voxtree_sphere,        "Voxtree - Sphere",              90, 0, 0},
     {&test_stack_basic,           "Stack - Basic",                 1, 0, 0},
     {&test_stack_advanced,        "Stack - Advanced",              1, 0, 0},
-    {&test_ntorus_basic,          "Ntorus",                        1, 0, 0}
+    {&test_ntorus_basic,          "Ntorus",                        1, 0, 0},
+    {&test_hmap_basic,            "Hmap - Basic",                  1, 0, 0}
 };
 
 int
