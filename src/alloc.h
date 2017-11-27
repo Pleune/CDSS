@@ -19,6 +19,7 @@
  * Asymmetric allocators return blocks of any size, like malloc/calloc
  * from the standard library
  */
+enum alloc_type {ALLOC_NONE, ALLOC_SYM, ALLOC_ASYM};
 
 typedef struct {
     union {
@@ -37,7 +38,7 @@ typedef struct {
         } asymmetric;
     } u;
 
-    enum {ALLOC_NONE, ALLOC_SYM, ALLOC_ASYM} type;
+    enum alloc_type type;
 } alloc_t;
 
 extern const alloc_t ALLOC_STDLIB;
