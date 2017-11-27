@@ -6,7 +6,7 @@
 
 typedef struct voxtree voxtree_t;
 
-voxtree_t *voxtree_create(unsigned dimensions, unsigned depth, alloc_t *allocator);
+voxtree_t *voxtree_create(unsigned dimensions, unsigned depth, const alloc_t *allocator);
 void voxtree_destroy(voxtree_t *);
 void *voxtree_get(voxtree_t *tree, const unsigned long pos[]);
 void voxtree_set(voxtree_t *tree, const unsigned long pos[], void *data);
