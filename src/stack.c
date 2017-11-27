@@ -1,4 +1,5 @@
-#include "cdss.h"
+#include "cdss/stack.h"
+#include "cdss/minmax.h"
 
 #include <string.h>
 #include <stdio.h>

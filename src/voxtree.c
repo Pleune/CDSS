@@ -1,4 +1,4 @@
-#include "cdss.h"
+#include "cdss/voxtree.h"
 
 #include <string.h>
 #include <assert.h>

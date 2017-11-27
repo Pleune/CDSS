@@ -1,4 +1,5 @@
-#include "cdss.h"
+#include "cdss/mpool_grow.h"
+#include "cdss/minmax.h"
 
 #include <string.h>
 #include <assert.h>

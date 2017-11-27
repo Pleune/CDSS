@@ -1,6 +1,6 @@
 #include "ringbuff.h"
 
-#include "cdss.h"
+#include "cdss/cdss.h"
 #include <unistd.h>
 
 int

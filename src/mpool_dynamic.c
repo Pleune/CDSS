@@ -1,4 +1,6 @@
-#include "cdss.h"
+#include "cdss/mpool_dynamic.h"
+#include "cdss/alloc.h"
+#include "cdss/minmax.h"
 
 #include <string.h>
 

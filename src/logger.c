@@ -1,8 +1,10 @@
-#include "cdss.h"
+#include "cdss/plog.h"
+#include "cdss/ringbuff.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <stdarg.h>
 
 #define BUFF_SIZE 8192
 #define MAX_MSG_LEN 256

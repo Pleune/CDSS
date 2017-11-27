@@ -1,6 +1,6 @@
 #include "ntorus.h"
 
-#include "cdss.h"
+#include "cdss/cdss.h"
 
 static size_t cbi = 0;
 static void *set_to = (void *)5;

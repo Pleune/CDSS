@@ -1,13 +1,8 @@
-#ifndef PLEUNE_H
-#define PLEUNE_H
+#ifndef CDSS_H
+#define CDSS_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MODULO(a, b) (((a) % (b) + (b)) % (b))
+#include "minmax.h"
+#include "modulo.h"
 
 #ifdef __cplusplus
 extern "C" {

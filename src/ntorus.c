@@ -1,4 +1,6 @@
-#include "cdss.h"
+#include "cdss/ntorus.h"
+#include "cdss/minmax.h"
+#include "cdss/modulo.h"
 
 #include <math.h>
 

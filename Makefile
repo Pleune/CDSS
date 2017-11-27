@@ -63,11 +63,11 @@ test: $(OUTPUTDIR)libpleune_tester $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
 	grep Finished test.log
 
 install: $(OUTPUTDIR)$(SNAME) $(OUTPUTDIR)$(DNAME)
-	mkdir -p /usr/local/lib
-	mkdir -p /usr/local/include
-	install $(OUTPUTDIR)$(SNAME) /usr/local/lib/
-	install -s $(OUTPUTDIR)$(DNAME) /usr/local/lib/
-	install $(SRCDIR)cdss.h /usr/local/include/
+	mkdir -p /usr/lib
+	mkdir -p /usr/include/cdss
+	install $(OUTPUTDIR)$(SNAME) /usr/lib/
+	install -s $(OUTPUTDIR)$(DNAME) /usr/lib/
+	install $(SRCDIR)cdss/*.h /usr/include/cdss/
 
 uninstall:
 	rm -f /usr/local/lib/$(SNAME)

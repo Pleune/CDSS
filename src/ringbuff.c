@@ -1,4 +1,5 @@
-#include "cdss.h"
+#include "cdss/ringbuff.h"
+#include "cdss/minmax.h"
 
 #include <string.h>
 #include <assert.h>

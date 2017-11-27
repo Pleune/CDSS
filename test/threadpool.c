@@ -1,7 +1,7 @@
 #include "threadpool.h"
 
 #include <time.h>
-#include "cdss.h"
+#include "cdss/cdss.h"
 
 void
 util_tpool_simple(void *v)

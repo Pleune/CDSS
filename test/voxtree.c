@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-#include "cdss.h"
+#include "cdss/cdss.h"
 
 int
 test_voxtree_basic(void)

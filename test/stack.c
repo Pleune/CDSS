@@ -1,6 +1,6 @@
 #include "stack.h"
 
-#include "cdss.h"
+#include "cdss/cdss.h"
 
 int
 test_stack_basic(void)

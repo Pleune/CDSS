@@ -1,4 +1,5 @@
-#include "cdss.h"
+#include "cdss/mpool_static.h"
+#include "cdss/minmax.h"
 
 #include <string.h>
 

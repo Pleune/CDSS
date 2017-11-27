@@ -1,3 +1,3 @@
-#include "alloc.h"
+#include "cdss/alloc.h"
 
-const alloc_t ALLOC_STDLIB = {{}, 0};
+const alloc_t ALLOC_STDLIB = {{}, ALLOC_NONE};

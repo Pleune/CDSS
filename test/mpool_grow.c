@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "cdss.h"
+#include "cdss/cdss.h"
 
 int
 test_mpool_grow_basic(void)
