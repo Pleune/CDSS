@@ -20,6 +20,6 @@ cdss_integer_t voxtree_get(voxtree_t *tree, const unsigned long pos[]);
 void            voxtree_set(voxtree_t *tree, const unsigned long pos[], cdss_integer_t data);
 size_t          voxtree_get_alloc_size(unsigned dimensions);
 long long       voxtree_count_nodes(voxtree_t *tree);
-void            voxtree_iterate_nodes(voxtree_t *tree, voxtree_node_cb);
+void            voxtree_iterate_nodes(voxtree_t *tree, voxtree_node_cb, int leavess_only);
 
 #endif

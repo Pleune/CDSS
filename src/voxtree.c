@@ -224,7 +224,7 @@ voxtree_count_nodes(voxtree_t *tree)
 
 // TODO: optimimize
 void
-voxtree_iterate_nodes(voxtree_t *tree, voxtree_node_cb cb)
+voxtree_iterate_nodes(voxtree_t *tree, voxtree_node_cb cb, int leaves_only)
 {
     struct stack {
         struct voxtree_n *node;
@@ -281,13 +281,16 @@ voxtree_iterate_nodes(voxtree_t *tree, voxtree_node_cb cb)
             }
         }
 
-        unsigned char region_mem[sizeof(voxtree_region_t) + sizeof(long)*tree->dim*2];
+        if (!(leaves_only && !node->node->isleaf))
+        {
+            unsigned char region_mem[sizeof(voxtree_region_t) + sizeof(long) * tree->dim * 2];
 
-        voxtree_region_t *r = (voxtree_region_t *)region_mem;
+            voxtree_region_t *r = (voxtree_region_t *)region_mem;
 
-        if (node->node->isleaf) r->data = node->node->u.data;
-        for (int i = 0; i < tree->dim * 2; i++) r->bounds[i] = node->aabb[i];
+            if (node->node->isleaf) r->data = node->node->u.data;
+            for (int i = 0; i < tree->dim * 2; i++) r->bounds[i] = node->aabb[i];
 
-        cb(node->node->isleaf, r);
+            cb(node->node->isleaf, r);
+        }
     }
 }

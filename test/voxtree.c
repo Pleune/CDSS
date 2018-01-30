@@ -72,7 +72,7 @@ test_voxtree_noise(void)
         voxtree_set(tree, pos, (cdss_integer_t){.uint = t});
     }
 
-    voxtree_iterate_nodes(tree, &noise_cb);
+    voxtree_iterate_nodes(tree, &noise_cb, 0);
 
     if(voxtree_count_nodes(tree) != noise_cb_int)
         return 1;
@@ -248,7 +248,7 @@ test_voxtree_sphere(void)
     }
 
     noise_cb_int = 0;
-    voxtree_iterate_nodes(tree, &noise_cb);
+    voxtree_iterate_nodes(tree, &noise_cb, 0);
     if(voxtree_count_nodes(tree) != noise_cb_int)
         return 1;
 
