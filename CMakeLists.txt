@@ -20,7 +20,9 @@ add_subdirectory(test)
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/cdss DESTINATION include)
 
-#Export a CDSSConfig.cmake to the user package directory (~/.cmake)
+#Copy the header for the export Config.cmake file, creating a dependency between the src and dest files
+configure_file(${CMAKE_SOURCE_DIR}/cmake/CDSSConfig-EXPORT.cmake ${CMAKE_BINARY_DIR}/CDSSConfig.cmake COPYONLY)
+
 export(TARGETS ${LIBRARY_NAME} ${LIBRARY_NAME_STAIC} APPEND FILE ${CMAKE_BINARY_DIR}/CDSSConfig.cmake)
 export(PACKAGE CDSS)
 
