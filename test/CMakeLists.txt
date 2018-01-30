@@ -14,6 +14,9 @@ set(SOURCE_FILES
   voxtree.c
   )
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+set(CMAKE_STATIC_LINKER_FLAGS_DEBUG  "${CMAKE_STATIC_LINKER_FLAGS_DEBUG} -fsanitize=address")
+
 add_executable(${TESTER_NAME} ${SOURCE_FILES})
 target_link_libraries(${TESTER_NAME} cdss m ${CMAKE_THREAD_LIBS_INIT})
 

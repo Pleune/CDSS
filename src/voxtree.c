@@ -2,13 +2,14 @@
 
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 
 struct voxtree_n {
     union {
         struct voxtree_n *children;
-        void *data;
+        cdss_integer_t data;
     } u;
-    unsigned char isleaf;
+    unsigned isleaf;
 };
 
 struct voxtree {
@@ -26,7 +27,7 @@ voxtree_get_alloc_size(unsigned dimensions)
 }
 
 voxtree_t *
-voxtree_create(unsigned dimensions, unsigned depth, const alloc_t *allocator)
+voxtree_create(unsigned dimensions, unsigned depth, const alloc_t *allocator, cdss_integer_t inital)
 {
     if(allocator && allocator->type == ALLOC_SYM)
         if(allocator->u.symmetric.size < sizeof(struct voxtree_n)*(1 << dimensions))
@@ -44,7 +45,7 @@ voxtree_create(unsigned dimensions, unsigned depth, const alloc_t *allocator)
         ret->allocator = ALLOC_STDLIB;
 
     ret->node.isleaf = 1;
-    ret->node.u.data = 0;
+    ret->node.u.data = inital;
 
     return ret;
 }
@@ -87,7 +88,7 @@ voxtree_destroy(voxtree_t *tree)
     free(tree);
 }
 
-void *
+cdss_integer_t
 voxtree_get(voxtree_t *tree, const unsigned long pos[])
 {
     unsigned i;
@@ -112,7 +113,7 @@ voxtree_get(voxtree_t *tree, const unsigned long pos[])
 }
 
 void
-voxtree_set(voxtree_t *tree, const unsigned long pos[], void *data)
+voxtree_set(voxtree_t *tree, const unsigned long pos[], cdss_integer_t data)
 {
     unsigned i;
     unsigned long width = 1 << tree->depth;
@@ -138,8 +139,9 @@ voxtree_set(voxtree_t *tree, const unsigned long pos[], void *data)
         width >>= 1;
     }
 
-    //step 2: return if already set correctly
-    if(node->u.data == data)
+    // step 2: return if already set correctly
+    // if(node->u.data == data)
+    if (CDSS_INT_CMP_ALL(node->u.data, data))
         return;
 
     //step 3: create any new nodes (if necessicary)
@@ -176,7 +178,7 @@ voxtree_set(voxtree_t *tree, const unsigned long pos[], void *data)
         if(!node->u.children[0].isleaf)
             return;
 
-        void *tmp = node->u.children[0].u.data;
+        cdss_integer_t tmp = node->u.children[0].u.data;
 
         unsigned i;
         for(i=1; i<tree->child_count; i++)
@@ -184,8 +186,7 @@ voxtree_set(voxtree_t *tree, const unsigned long pos[], void *data)
             if(!node->u.children[i].isleaf)
                 return;
 
-            if(tmp != node->u.children[i].u.data)
-                return;
+            if (!CDSS_INT_CMP_ALL(tmp, node->u.children[i].u.data)) return;
         }
 
         cdss_free(&tree->allocator, node->u.children);
@@ -219,4 +220,74 @@ voxtree_count_nodes(voxtree_t *tree)
         nodes += voxtree_count_nodes_rec(&tree->node.u.children[i], tree->child_count);
 
     return nodes;
+}
+
+// TODO: optimimize
+void
+voxtree_iterate_nodes(voxtree_t *tree, voxtree_node_cb cb)
+{
+    struct stack {
+        struct voxtree_n *node;
+        long              aabb[];
+    };
+
+    const size_t stack_elem_size = sizeof(struct stack) + sizeof(long) * tree->dim * 2;
+
+    /*
+     * Super wonky malloc-like code on the stack
+     */
+    unsigned char stack_data[stack_elem_size * (tree->depth * tree->child_count +1)];
+    //CANT DO THIS HERE, [] are confusing!
+    //struct stack *stack = (struct stack *)stack_data;
+
+    unsigned char node_data[stack_elem_size];
+    struct stack *node = (struct stack *)node_data;
+
+    int stack_index = 1;
+    ((struct stack *)stack_data)->node   = &tree->node;
+
+    for (int i = 0; i < tree->dim; i++)
+    {
+        ((struct stack *)stack_data)->aabb[i]             = 0;
+        ((struct stack *)stack_data)->aabb[i + tree->dim] = 2 << tree->depth;
+    }
+
+    while (stack_index != 0)
+    {
+        memcpy(node, stack_data + --stack_index*stack_elem_size, stack_elem_size);
+
+        if (!node->node->isleaf)
+        {
+            for (int i = 0; i < tree->child_count; i++)
+            {
+                unsigned char tmp_data[stack_elem_size];
+                struct stack *tmp = (struct stack *)tmp_data;
+                tmp->node = &node->node->u.children[i];
+
+                // TODO: verify aabb code
+                /*
+                 * Shrink the aabb to the correct partition by
+                 * averaging all points twards the correct corner
+                 */
+                for (int j = 0; j < tree->dim; j++)
+                {
+                    if ((i >> (tree->dim - j)) & 1)
+                        tmp->aabb[j] = (tmp->aabb[j] + tmp->aabb[j + tree->dim]) / 2;
+                    else
+                        tmp->aabb[j + tree->dim] = (tmp->aabb[j] + tmp->aabb[j + tree->dim]) / 2;
+                }
+
+                memcpy(stack_data + stack_index++*stack_elem_size, tmp, stack_elem_size);
+            }
+        }
+
+        unsigned char region_mem[sizeof(voxtree_region_t) + sizeof(long)*tree->dim*2];
+
+        voxtree_region_t *r = (voxtree_region_t *)region_mem;
+
+        if (node->node->isleaf) r->data = node->node->u.data;
+        for (int i = 0; i < tree->dim * 2; i++) r->bounds[i] = node->aabb[i];
+
+        cb(node->node->isleaf, r);
+    }
 }
