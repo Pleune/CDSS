@@ -12,13 +12,16 @@ set(TESTER_NAME         cdss_tester)
 set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set (LIBRARY_OUTPUT_PATH    ${EXECUTABLE_OUTPUT_PATH})
 
+set(CDSS_LIBRARIES cdss)
+set(CDSS_INCLUDE_DIRECTORIES ${CMAKE_SRC_DIR}/include)
+
 add_subdirectory(src)
 add_subdirectory(test)
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/cdss DESTINATION include)
 
 #Export a CDSSConfig.cmake to the user package directory (~/.cmake)
-export(TARGETS ${LIBRARY_NAME} ${LIBRARY_NAME_STAIC} FILE ${CMAKE_BINARY_DIR}/CDSSConfig.cmake)
+export(TARGETS ${LIBRARY_NAME} ${LIBRARY_NAME_STAIC} APPEND FILE ${CMAKE_BINARY_DIR}/CDSSConfig.cmake)
 export(PACKAGE CDSS)
 
 set(ConfigPackageLocation lib/cmake/CDSS)
