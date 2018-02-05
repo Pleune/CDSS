@@ -1,6 +1,4 @@
-#include "ringbuff.h"
-
-#include "cdss/cdss.h"
+#include "cdss/plog.h"
 #include <unistd.h>
 
 int
@@ -19,10 +17,16 @@ test_logger_basic(void)
     for(i=0; i<100; i++)
         plog(L_ERROR, "SOME ERRORS %i", i);
 
-    for(i=0; i<100; i++)
-        plog(L_FATAL, "FATAL ERRORS SHOULD DIE %i", i);
+    //for(i=0; i<100; i++)
+        //plog(L_FATAL, "FATAL ERRORS SHOULD DIE %i", i);
 
     plog_flush();
 
     return 0;
+}
+
+int
+main()
+{
+    return test_logger_basic();
 }

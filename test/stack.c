@@ -1,5 +1,3 @@
-#include "stack.h"
-
 #include "cdss/cdss.h"
 
 int
@@ -94,4 +92,10 @@ test_stack_advanced(void)
     stack_destroy(stack);
 
     return 0;
+}
+
+int
+main()
+{
+    return test_stack_basic() || test_stack_advanced();
 }

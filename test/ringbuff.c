@@ -1,5 +1,3 @@
-#include "ringbuff.h"
-
 #include <string.h>
 #include "cdss/cdss.h"
 
@@ -37,4 +35,10 @@ int test_ringbuff_basic(void)
     ringbuff_destroy(buff);
 
     return 0;
+}
+
+int
+main()
+{
+    return test_ringbuff_basic();
 }

@@ -1,5 +1,3 @@
-#include "threadpool.h"
-
 #include <time.h>
 #include "cdss/cdss.h"
 
@@ -43,9 +41,7 @@ test_tpool_max_threads(void)
 }
 
 int
-test_tpool_invalid_threads(void)
+main()
 {
-    tpool_create(257);
-    tpool_create(0);
-    return 0;
+    return test_tpool_basic() || test_tpool_max_threads();
 }

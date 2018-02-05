@@ -1,5 +1,3 @@
-#include "ntorus.h"
-
 #include "cdss/cdss.h"
 
 static size_t cbi = 0;
@@ -90,4 +88,10 @@ test_ntorus_basic(void)
     ntorus_destroy(n);
 
     return 0;
+}
+
+int
+main()
+{
+    return test_ntorus_basic();
 }

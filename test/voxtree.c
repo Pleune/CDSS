@@ -1,5 +1,3 @@
-#include "voxtree.h"
-
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
@@ -260,4 +258,10 @@ test_voxtree_sphere(void)
 #undef z
 
     return 0;
+}
+
+int
+main()
+{
+    return test_voxtree_basic() || test_voxtree_mpool() || test_voxtree_noise() || test_voxtree_high_dim() || test_voxtree_sphere();
 }

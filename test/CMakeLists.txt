@@ -3,7 +3,6 @@ find_package(Threads REQUIRED)
 
 set(SOURCE_FILES
   logger.c
-  main.c
   mpool_dynamic.c
   mpool_grow.c
   mpool_static.c
@@ -17,7 +16,10 @@ set(SOURCE_FILES
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 set(CMAKE_STATIC_LINKER_FLAGS_DEBUG  "${CMAKE_STATIC_LINKER_FLAGS_DEBUG} -fsanitize=address")
 
-add_executable(${TESTER_NAME} ${SOURCE_FILES})
-target_link_libraries(${TESTER_NAME} cdss m ${CMAKE_THREAD_LIBS_INIT})
+foreach(SOURCE_FILE ${SOURCE_FILES})
+  get_filename_component(FILE ${SOURCE_FILE} NAME_WE)
 
-add_test(CDSS_TESTER ${TESTER_NAME})
+  add_executable(${FILE} ${SOURCE_FILE})
+  target_link_libraries(${FILE} ${LIBRARY_NAME_STATIC} m ${CMAKE_THREAD_LIBS_INIT})
+  add_test(NAME ${FILE} COMMAND ${FILE})
+endforeach(SOURCE_FILE)

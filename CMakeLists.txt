@@ -7,7 +7,6 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set(LIBRARY_NAME        cdss)
 set(LIBRARY_NAME_STATIC cdss_static)
-set(TESTER_NAME         cdss_tester)
 
 set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set (LIBRARY_OUTPUT_PATH    ${EXECUTABLE_OUTPUT_PATH})

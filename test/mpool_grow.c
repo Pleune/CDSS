@@ -1,5 +1,3 @@
-#include "mpool_grow.h"
-
 #include <time.h>
 #include <stdlib.h>
 
@@ -60,4 +58,10 @@ test_mpool_grow_basic(void)
     free(pointers);
 
     return 0;
+}
+
+int
+main()
+{
+    return test_mpool_grow_basic();
 }
