@@ -28,3 +28,5 @@ install(
   EXPORT CDSSTargets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib)
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/cdss DESTINATION include)

@@ -1,4 +1,0 @@
-include("${CMAKE_CURRENT_LIST_DIR}/CDSSTargets.cmake")
-
-set(CDSS_INCLUDE_DIRS)
-set(CDSS_LIBRARIES CDSS::cdss)
