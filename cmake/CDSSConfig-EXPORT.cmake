@@ -1,2 +1,2 @@
 set(CDSS_INCLUDE_DIRS)
-set(CDSS_LIBRARIES CDSS::cdss)
+set(CDSS_LIBRARIES cdss)
