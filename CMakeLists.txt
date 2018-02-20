@@ -21,7 +21,7 @@ add_subdirectory(src)
 add_subdirectory(test)
 
 # Ex[prt all targets for use from the build-tree]
-export(TARGETS ${LIBRARY_NAME} ${LIBRARY_NAME_STAIC} FILE ${CMAKE_BINARY_DIR}/CDSSTargets.cmake)
+export(TARGETS ${LIBRARY_NAME} ${LIBRARY_NAME_STATIC} ${LIBRARY_NAME_STAIC} FILE ${CMAKE_BINARY_DIR}/CDSSTargets.cmake)
 # And export to local package database
 export(PACKAGE CDSS)
 
