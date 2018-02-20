@@ -108,13 +108,16 @@ stack_push(struct stack *stack, const void *data)
 void *
 stack_pop(struct stack *stack, void *data)
 {
-	if(stack->top == stack->data)
-		return 0;
+    if (stack->top == stack->data) return 0;
 
-	stack->top -= stack->object_size;
-	memcpy(data, stack->top, stack->object_size);
+    stack->top -= stack->object_size;
 
-	return data;
+    //prevent popping into same data. overlapping memcpy is undef
+    if (((unsigned char *)data <= stack->top - stack->object_size)
+        || ((unsigned char *)data > stack->top + stack->object_size))
+        memcpy(data, stack->top, stack->object_size);
+
+    return data;
 }
 
 void *
