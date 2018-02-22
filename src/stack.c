@@ -163,3 +163,9 @@ stack_transform_dataptr(struct stack *stack)
 	free(stack);
 	return ret;
 }
+
+void
+stack_clear(struct stack *stack)
+{
+    stack->top = stack->data;
+}

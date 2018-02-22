@@ -20,5 +20,6 @@ void *stack_element_ref(stack_t *stack, size_t index);
 //returns the ref to index, or 0 on error
 void *stack_element_replace_from_end(stack_t *stack, size_t index);
 void *stack_transform_dataptr(stack_t *stack);
+void stack_clear(stack_t *stack);
 
 #endif
