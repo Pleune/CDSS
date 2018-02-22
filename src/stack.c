@@ -73,7 +73,7 @@ stack_resize(struct stack *stack, size_t num_elements)
 }
 
 void
-stack_ensure_size(stack_t *stack, size_t num_elements)
+stack_ensure_size(struct stack *stack, size_t num_elements)
 {
 	size_t size_after = stack->size;
 
@@ -121,7 +121,7 @@ stack_pop(struct stack *stack, void *data)
 }
 
 void *
-stack_element_ref(stack_t* stack, size_t index)
+stack_element_ref(struct stack* stack, size_t index)
 {
 	if(index >= stack->size / stack->object_size)
 		return 0;
@@ -131,7 +131,7 @@ stack_element_ref(stack_t* stack, size_t index)
 }
 
 void *
-stack_element_replace_from_end(stack_t* stack, size_t index)
+stack_element_replace_from_end(struct stack* stack, size_t index)
 {
 	void *ref;
 	if((ref = stack_element_ref(stack, index)) == 0)
@@ -150,14 +150,14 @@ stack_push_mult(struct stack* stack, const void* data, size_t count)
 }
 
 void
-stack_advance(stack_t *stack, size_t count)
+stack_advance(struct stack *stack, size_t count)
 {
 	stack_ensure_size(stack, (stack->top - stack->data) + stack->object_size*count);
 	stack->top += stack->object_size * count;
 }
 
 void *
-stack_transform_dataptr(stack_t *stack)
+stack_transform_dataptr(struct stack *stack)
 {
 	void *ret = stack->data;
 	free(stack);
