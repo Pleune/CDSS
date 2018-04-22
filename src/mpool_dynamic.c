@@ -71,7 +71,7 @@ mpool_dynamic_alloc(mpool_dynamic_t *m)
 {
     void *ret;
 
- mpool_dynamic_alloc_top:
+ mpool_dynamic_cdss_alloc_top:
 
     ret = m->next_free;
     if(ret == 0)
@@ -80,7 +80,7 @@ mpool_dynamic_alloc(mpool_dynamic_t *m)
             m->next_block = mpool_dynamic_create(m->block_size, m->object_size, m->alignment);
 
         m = m->next_block;
-        goto mpool_dynamic_alloc_top;
+        goto mpool_dynamic_cdss_alloc_top;
     }
 
     m->num_objects++;
@@ -136,10 +136,10 @@ mpool_dynamic_blocks(mpool_dynamic_t *m)
     return i;
 }
 
-alloc_t
+cdss_alloc_t
 mpool_dynamic_allocator(mpool_dynamic_t *m)
 {
-    static alloc_t ret = {
+    static cdss_alloc_t ret = {
         {
             .symmetric = {
                 (void *(*)(void *))&mpool_dynamic_alloc,

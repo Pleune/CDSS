@@ -16,7 +16,7 @@ struct voxtree {
     unsigned depth;
     unsigned dim;
     unsigned child_count;
-    alloc_t allocator;
+    cdss_alloc_t allocator;
     struct voxtree_n node;
 };
 
@@ -27,7 +27,7 @@ voxtree_get_alloc_size(unsigned dimensions)
 }
 
 voxtree_t *
-voxtree_create(unsigned dimensions, unsigned depth, const alloc_t *allocator, cdss_integer_t inital)
+voxtree_create(unsigned dimensions, unsigned depth, const cdss_alloc_t *allocator, cdss_integer_t inital)
 {
     if(allocator && allocator->type == ALLOC_SYM)
         if(allocator->u.symmetric.size < sizeof(struct voxtree_n)*(1 << dimensions))
@@ -121,7 +121,7 @@ voxtree_set(voxtree_t *tree, const unsigned long pos[], cdss_integer_t data)
     for(i=0; i<tree->dim; i++)
         assert(pos[i] < width);
 
-    alloc_t allocator = tree->allocator;
+    cdss_alloc_t allocator = tree->allocator;
     unsigned node_stack_index = 0;
     struct voxtree_n *node_stack[tree->depth];
     register struct voxtree_n *node = &tree->node;

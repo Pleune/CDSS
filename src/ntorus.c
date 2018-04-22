@@ -7,7 +7,7 @@
 struct ntorus {
     size_t dimensions;
     ntorus_cb_t in, out;
-    alloc_t allocator;
+    cdss_alloc_t allocator;
     void *default_value;
 
     union {
@@ -45,7 +45,7 @@ data_segment(struct ntorus *n)
 }
 
 ntorus_t *
-ntorus_create(size_t dimensions, const size_t size[], void *default_value, const alloc_t *allocator)
+ntorus_create(size_t dimensions, const size_t size[], void *default_value, const cdss_alloc_t *allocator)
 {
     size_t data_len = size[0];
     size_t i;

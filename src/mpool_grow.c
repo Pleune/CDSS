@@ -140,10 +140,10 @@ mpool_grow_free(mpool_grow_t *m, void *p)
     ((struct mpool_grow *)m)->next_free = p;
 }
 
-alloc_t
+cdss_alloc_t
 mpool_grow_allocator(mpool_grow_t *m)
 {
-    static alloc_t ret = {
+    static cdss_alloc_t ret = {
         {
             .symmetric = {
                 (void *(*)(void *))&mpool_grow_alloc,

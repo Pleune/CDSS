@@ -10,6 +10,6 @@ static inline void mpool_static_destroy(mpool_static_t *m) {free(m);}
 void *mpool_static_alloc(mpool_static_t *);
 void *mpool_static_calloc(mpool_static_t *);
 void mpool_static_free(mpool_static_t *, void *);
-alloc_t mpool_static_allocator(mpool_static_t *);
+cdss_alloc_t mpool_static_allocator(mpool_static_t *);
 
 #endif

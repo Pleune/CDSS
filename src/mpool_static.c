@@ -60,10 +60,10 @@ mpool_static_free(mpool_static_t *m, void *p)
     m->next_free = p;
 }
 
-alloc_t
+cdss_alloc_t
 mpool_static_allocator(mpool_static_t *m)
 {
-    static alloc_t ret = {
+    static cdss_alloc_t ret = {
         {
             .symmetric = {
                 (void *(*)(void *))&mpool_static_alloc,

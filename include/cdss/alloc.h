@@ -10,7 +10,7 @@
  *
  * All allocators in this library will have a function to build
  * this struct. Furthermore, any function in this library that
- * asks for a alloc_t pointer will also accept a void pointer,
+ * asks for a cdss_alloc_t pointer will also accept a void pointer,
  * meaning that function should use malloc/calloc/free from
  * the standard library.
  *
@@ -19,7 +19,7 @@
  * Asymmetric allocators return blocks of any size, like malloc/calloc
  * from the standard library
  */
-enum alloc_type {ALLOC_NONE, ALLOC_SYM, ALLOC_ASYM};
+enum cdss_alloc_type {ALLOC_NONE, ALLOC_SYM, ALLOC_ASYM};
 
 typedef struct {
     union {
@@ -38,13 +38,13 @@ typedef struct {
         } asymmetric;
     } u;
 
-    enum alloc_type type;
-} alloc_t;
+    enum cdss_alloc_type type;
+} cdss_alloc_t;
 
-extern const alloc_t ALLOC_STDLIB;
+extern const cdss_alloc_t ALLOC_STDLIB;
 
 inline static void *
-cdss_malloc(const alloc_t *a, const size_t s)
+cdss_malloc(const cdss_alloc_t *a, const size_t s)
 {
     switch(a->type)
     {
@@ -60,7 +60,7 @@ cdss_malloc(const alloc_t *a, const size_t s)
 }
 
 inline static void *
-cdss_calloc(const alloc_t *a, const size_t s)
+cdss_calloc(const cdss_alloc_t *a, const size_t s)
 {
     switch(a->type)
     {
@@ -76,7 +76,7 @@ cdss_calloc(const alloc_t *a, const size_t s)
 }
 
 inline static void
-cdss_free(const alloc_t *a, void *d)
+cdss_free(const cdss_alloc_t *a, void *d)
 {
     switch(a->type)
     {
@@ -93,7 +93,7 @@ cdss_free(const alloc_t *a, void *d)
 }
 
 inline static unsigned
-cdss_alloc_ensure(const alloc_t *a, const size_t s)
+cdss_alloc_ensure(const cdss_alloc_t *a, const size_t s)
 {
     if(a->type == ALLOC_SYM && a->u.symmetric.size < s)
         return 0;

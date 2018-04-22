@@ -10,6 +10,6 @@ void mpool_grow_destroy(mpool_grow_t *);
 void *mpool_grow_alloc(mpool_grow_t *);
 void *mpool_grow_calloc(mpool_grow_t *);
 void mpool_grow_free(mpool_grow_t *, void *);
-alloc_t mpool_grow_allocator(mpool_grow_t *);
+cdss_alloc_t mpool_grow_allocator(mpool_grow_t *);
 
 #endif

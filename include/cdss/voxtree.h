@@ -14,7 +14,7 @@ typedef struct {
 
 typedef void (*voxtree_node_cb)(int is_leaf, const voxtree_region_t *region);
 
-voxtree_t *     voxtree_create(unsigned dimensions, unsigned depth, const alloc_t *allocator, cdss_integer_t inital);
+voxtree_t *     voxtree_create(unsigned dimensions, unsigned depth, const cdss_alloc_t *allocator, cdss_integer_t inital);
 void            voxtree_destroy(voxtree_t *);
 cdss_integer_t voxtree_get(voxtree_t *tree, const unsigned long pos[]);
 void            voxtree_set(voxtree_t *tree, const unsigned long pos[], cdss_integer_t data);

@@ -10,7 +10,7 @@ typedef void (*ntorus_cb_t)(ntorus_t *, void **data);
 ntorus_t *ntorus_create(const size_t dimensions,
                         const size_t size[],
                         void *default_value,
-                        const alloc_t *allocator);
+                        const cdss_alloc_t *allocator);
 static inline void ntorus_destroy(ntorus_t *n) {free(n);}
 void **ntorus_at(ntorus_t *, const size_t pos[]);
 void ntorus_foreach(ntorus_t *,

@@ -166,7 +166,7 @@ int
 test_voxtree_mpool(void)
 {
     mpool_grow_t *pool = mpool_grow_create(4096*16, voxtree_get_alloc_size(3), 8);
-    alloc_t allocator = mpool_grow_allocator(pool);
+    cdss_alloc_t allocator = mpool_grow_allocator(pool);
     voxtree_t *tree = voxtree_create(3, 5, &allocator, cintzero);//32x32x32
 
     unsigned int data[32][32][32] = {{{0}}};
@@ -228,7 +228,7 @@ int
 test_voxtree_sphere(void)
 {
     mpool_grow_t *pool = mpool_grow_create(1024*64, voxtree_get_alloc_size(3), 8);
-    alloc_t allocator = mpool_grow_allocator(pool);
+    cdss_alloc_t allocator = mpool_grow_allocator(pool);
     voxtree_t *tree = voxtree_create(3, 10, &allocator, cintzero);//1024x1024x1024
 
     unsigned long pos[3];
