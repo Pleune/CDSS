@@ -1,12 +1,14 @@
 #ifndef CDSS_H
 #define CDSS_H
 
-#include "minmax.h"
-#include "modulo.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "minmax.h"
+#include "modulo.h"
+#include "types.h"
+#include "alloc.h"
 
 #include "mpool_static.h"
 #include "mpool_grow.h"
