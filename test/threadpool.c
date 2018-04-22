@@ -1,5 +1,5 @@
 #include <time.h>
-#include "cdss/cdss.h"
+#include "cdss/cdss_all.h"
 
 void
 util_tpool_simple(void *v)

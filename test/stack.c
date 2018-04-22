@@ -1,4 +1,4 @@
-#include "cdss/cdss.h"
+#include "cdss/cdss_all.h"
 
 int
 test_stack_basic(void)

@@ -1,4 +1,4 @@
-#include "cdss/cdss.h"
+#include "cdss/cdss_all.h"
 
 static size_t cbi = 0;
 static void *set_to = (void *)5;

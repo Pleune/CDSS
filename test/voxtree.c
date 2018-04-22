@@ -2,7 +2,7 @@
 #include <time.h>
 #include <math.h>
 
-#include "cdss/cdss.h"
+#include "cdss/cdss_all.h"
 #include "cdss/types.h"
 
 static cdss_integer_t cintzero = {.uint = 0};

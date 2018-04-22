@@ -1,5 +1,5 @@
 #include <string.h>
-#include "cdss/cdss.h"
+#include "cdss/cdss_all.h"
 
 int test_ringbuff_basic(void)
 {

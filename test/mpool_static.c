@@ -1,7 +1,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "cdss/cdss.h"
+#include "cdss/cdss_all.h"
 
 int
 test_mpool_static_basic(void)
