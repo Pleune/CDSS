@@ -3,13 +3,13 @@
 
 #include "alloc.h"
 
-typedef struct mpool_static mpool_static_t;
+typedef struct mpool_st mpool_st_t;
 
-mpool_static_t *mpool_static_create(size_t pool_size, size_t object_size, size_t alignment);
-static inline void mpool_static_destroy(mpool_static_t *m) {free(m);}
-void *mpool_static_alloc(mpool_static_t *);
-void *mpool_static_calloc(mpool_static_t *);
-void mpool_static_free(mpool_static_t *, void *);
-cdss_alloc_t mpool_static_allocator(mpool_static_t *);
+mpool_st_t *mpool_st_create(size_t pool_size, size_t object_size, size_t alignment);
+static inline void mpool_st_destroy(mpool_st_t *m) {free(m);}
+void *mpool_st_alloc(mpool_st_t *);
+void *mpool_st_calloc(mpool_st_t *);
+void mpool_st_free(mpool_st_t *, void *);
+cdss_alloc_t mpool_st_allocator(mpool_st_t *);
 
 #endif

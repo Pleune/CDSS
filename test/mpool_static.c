@@ -4,18 +4,18 @@
 #include "cdss/cdss_all.h"
 
 int
-test_mpool_static_basic(void)
+test_mpool_st_basic(void)
 {
-    mpool_static_t *pool = mpool_static_create(4096*8, sizeof(long long), 8);
+    mpool_st_t *pool = mpool_st_create(4096*8, sizeof(long long), 8);
     long long **pointers = malloc(10000*sizeof(long long *));
     size_t i;
 
     //exaust pool
     for(i=0; i<10000; i++)
-        pointers[i] = mpool_static_alloc(pool);
+        pointers[i] = mpool_st_alloc(pool);
 
     //exausted pool shouldnt alloc
-    if(mpool_static_alloc(pool))
+    if(mpool_st_alloc(pool))
         return 1;
 
     //write zero to make sure we dont lead pointers
@@ -32,7 +32,7 @@ test_mpool_static_basic(void)
     for(i=0; i<10000; i++)
     {
         if(pointers[i])
-            mpool_static_free(pool, pointers[i]);
+            mpool_st_free(pool, pointers[i]);
         pointers[i] = 0;
     }
 
@@ -46,10 +46,10 @@ test_mpool_static_basic(void)
         if(pointers[j])
         {
             if(pointers[j][0] != (int)j) return 1;
-            mpool_static_free(pool, pointers[j]);
+            mpool_st_free(pool, pointers[j]);
             pointers[j] = 0;
         } else {
-            pointers[j] = mpool_static_alloc(pool);
+            pointers[j] = mpool_st_alloc(pool);
             if(pointers[j]) pointers[j][0] = j;
         }
     }
@@ -60,11 +60,11 @@ test_mpool_static_basic(void)
         if(pointers[i])
         {
             if(pointers[i][0] != (int)i) return 1;
-            mpool_static_free(pool, pointers[i]);
+            mpool_st_free(pool, pointers[i]);
         }
     }
 
-    mpool_static_destroy(pool);
+    mpool_st_destroy(pool);
     free(pointers);
 
     return 0;
@@ -73,5 +73,5 @@ test_mpool_static_basic(void)
 int
 main()
 {
-    return test_mpool_static_basic();
+    return test_mpool_st_basic();
 }

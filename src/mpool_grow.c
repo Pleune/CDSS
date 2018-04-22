@@ -42,14 +42,14 @@
  */
 
 #define HEADER_SIZE(alignment, pointer)                                 \
-    (sizeof(struct mpool_grow) + (alignment -                           \
-     (sizeof(struct mpool_grow) + (size_t)pointer))%alignment)
+    (sizeof(struct mpool_gr) + (alignment -                           \
+     (sizeof(struct mpool_gr) + (size_t)pointer))%alignment)
 
 #define OBJECT_SIZE(alignment, obj_size)                                \
     (MAX(sizeof(void *), obj_size) + (alignment -                       \
      MAX(sizeof(void *), obj_size))%alignment)
 
-struct mpool_grow {
+struct mpool_gr {
     void *next_block;
 
     //vvv only used in first block vvv
@@ -59,24 +59,24 @@ struct mpool_grow {
     size_t alignment;
 };
 
-mpool_grow_t *
-mpool_grow_create(size_t block_size, size_t object_size, size_t alignment)
+mpool_gr_t *
+mpool_gr_create(size_t block_size, size_t object_size, size_t alignment)
 {
     if(alignment < 1)
         alignment = 1;
 
     object_size = OBJECT_SIZE(alignment, object_size);
-    assert(block_size >= sizeof(struct mpool_grow) + object_size + alignment);
+    assert(block_size >= sizeof(struct mpool_gr) + object_size + alignment);
 
     void *ret = malloc(block_size);
     const void * const end = ret + block_size;
     void *next, *this;
 
-    ((struct mpool_grow *)ret)->object_size = object_size;
-    ((struct mpool_grow *)ret)->block_size = block_size;
-    ((struct mpool_grow *)ret)->alignment = alignment;
-    ((struct mpool_grow *)ret)->next_block = 0;
-    ((struct mpool_grow *)ret)->next_free = next = this = ret + HEADER_SIZE(alignment, ret);
+    ((struct mpool_gr *)ret)->object_size = object_size;
+    ((struct mpool_gr *)ret)->block_size = block_size;
+    ((struct mpool_gr *)ret)->alignment = alignment;
+    ((struct mpool_gr *)ret)->next_block = 0;
+    ((struct mpool_gr *)ret)->next_free = next = this = ret + HEADER_SIZE(alignment, ret);
 
     //build free list
     while(next <= end - object_size)//next has room to be an object
@@ -93,62 +93,62 @@ mpool_grow_create(size_t block_size, size_t object_size, size_t alignment)
 }
 
 void
-mpool_grow_destroy(mpool_grow_t *m)
+mpool_gr_destroy(mpool_gr_t *m)
 {
     void *this = m;
     while(this)
     {
-        void *next = ((struct mpool_grow *)this)->next_block;
+        void *next = ((struct mpool_gr *)this)->next_block;
         free(this);
         this = next;
     }
 }
 
 void *
-mpool_grow_alloc(mpool_grow_t *m)
+mpool_gr_alloc(mpool_gr_t *m)
 {
-    void *ret = ((struct mpool_grow *)m)->next_free;
+    void *ret = ((struct mpool_gr *)m)->next_free;
 
     if(ret == 0)
     {
-        size_t object_size = ((struct mpool_grow *)m)->object_size;
-        size_t block_size = ((struct mpool_grow *)m)->block_size;
-        size_t alignment = ((struct mpool_grow *)m)->alignment;
+        size_t object_size = ((struct mpool_gr *)m)->object_size;
+        size_t block_size = ((struct mpool_gr *)m)->block_size;
+        size_t alignment = ((struct mpool_gr *)m)->alignment;
 
-        void *newblock = mpool_grow_create(block_size, object_size, alignment);
+        void *newblock = mpool_gr_create(block_size, object_size, alignment);
 
-        ((struct mpool_grow *)newblock)->next_block = ((struct mpool_grow *)m)->next_block;
-        ((struct mpool_grow *)m)->next_block = newblock;
+        ((struct mpool_gr *)newblock)->next_block = ((struct mpool_gr *)m)->next_block;
+        ((struct mpool_gr *)m)->next_block = newblock;
 
-        ret = ((struct mpool_grow *)newblock)->next_free;
+        ret = ((struct mpool_gr *)newblock)->next_free;
     }
 
-    ((struct mpool_grow *)m)->next_free = *(void **)(ret);
+    ((struct mpool_gr *)m)->next_free = *(void **)(ret);
     return ret;
 }
 
 void *
-mpool_grow_calloc(mpool_grow_t *m)
+mpool_gr_calloc(mpool_gr_t *m)
 {
-    return memset(mpool_grow_alloc(m), 0, m->object_size);
+    return memset(mpool_gr_alloc(m), 0, m->object_size);
 }
 
 void
-mpool_grow_free(mpool_grow_t *m, void *p)
+mpool_gr_free(mpool_gr_t *m, void *p)
 {
-    *(void **)p = ((struct mpool_grow *)m)->next_free;
-    ((struct mpool_grow *)m)->next_free = p;
+    *(void **)p = ((struct mpool_gr *)m)->next_free;
+    ((struct mpool_gr *)m)->next_free = p;
 }
 
 cdss_alloc_t
-mpool_grow_allocator(mpool_grow_t *m)
+mpool_gr_allocator(mpool_gr_t *m)
 {
     static cdss_alloc_t ret = {
         {
             .symmetric = {
-                (void *(*)(void *))&mpool_grow_alloc,
-                (void *(*)(void *))&mpool_grow_calloc,
-                (void (*)(void *, void *))&mpool_grow_free,
+                (void *(*)(void *))&mpool_gr_alloc,
+                (void *(*)(void *))&mpool_gr_calloc,
+                (void (*)(void *, void *))&mpool_gr_free,
                 0, 0
             }
         },

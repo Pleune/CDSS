@@ -4,15 +4,15 @@
 #include "cdss/cdss_all.h"
 
 int
-test_mpool_grow_basic(void)
+test_mpool_gr_basic(void)
 {
-    mpool_grow_t *pool = mpool_grow_create(1024, sizeof(int), 8);
+    mpool_gr_t *pool = mpool_gr_create(1024, sizeof(int), 8);
     int **pointers = malloc(10000*sizeof(int *));
     size_t i;
 
     //linear test
     for(i=0; i<10000; i++)
-        pointers[i] = mpool_grow_alloc(pool);
+        pointers[i] = mpool_gr_alloc(pool);
 
     for(i=0; i<10000; i++)
         pointers[i][0] = i;
@@ -21,7 +21,7 @@ test_mpool_grow_basic(void)
         if(pointers[i][0] != (int)i) return 1;
 
     for(i=0; i<10000; i++)
-        mpool_grow_free(pool, pointers[i]);
+        mpool_gr_free(pool, pointers[i]);
 
 
     //errotic test to scramble free list
@@ -37,10 +37,10 @@ test_mpool_grow_basic(void)
         if(pointers[j])
         {
             if(pointers[j][0] != (int)j) return 1;
-            mpool_grow_free(pool, pointers[j]);
+            mpool_gr_free(pool, pointers[j]);
             pointers[j] = 0;
         } else {
-            pointers[j] = mpool_grow_alloc(pool);
+            pointers[j] = mpool_gr_alloc(pool);
             pointers[j][0] = j;
         }
     }
@@ -50,11 +50,11 @@ test_mpool_grow_basic(void)
         if(pointers[i])
         {
             if(pointers[i][0] != (int)i) return 1;
-            mpool_grow_free(pool, pointers[i]);
+            mpool_gr_free(pool, pointers[i]);
         }
     }
 
-    mpool_grow_destroy(pool);
+    mpool_gr_destroy(pool);
     free(pointers);
 
     return 0;
@@ -63,5 +63,5 @@ test_mpool_grow_basic(void)
 int
 main()
 {
-    return test_mpool_grow_basic();
+    return test_mpool_gr_basic();
 }

@@ -3,14 +3,14 @@
 
 #include "alloc.h"
 
-typedef struct mpool_dynamic mpool_dynamic_t;
+typedef struct mpool_dy mpool_dy_t;
 
-mpool_dynamic_t *mpool_dynamic_create(size_t block_size, size_t object_size, size_t alignment);
-void mpool_dynamic_destroy(mpool_dynamic_t *);
-void *mpool_dynamic_alloc(mpool_dynamic_t *);
-void *mpool_dynamic_calloc(mpool_dynamic_t *);
-void mpool_dynamic_free(mpool_dynamic_t *, void *);
-size_t mpool_dynamic_blocks(mpool_dynamic_t *);
-cdss_alloc_t mpool_dynamic_allocator(mpool_dynamic_t *);
+mpool_dy_t *mpool_dy_create(size_t block_size, size_t object_size, size_t alignment);
+void mpool_dy_destroy(mpool_dy_t *);
+void *mpool_dy_alloc(mpool_dy_t *);
+void *mpool_dy_calloc(mpool_dy_t *);
+void mpool_dy_free(mpool_dy_t *, void *);
+size_t mpool_dy_blocks(mpool_dy_t *);
+cdss_alloc_t mpool_dy_allocator(mpool_dy_t *);
 
 #endif
